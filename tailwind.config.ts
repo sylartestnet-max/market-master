@@ -57,6 +57,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Neon colors for FiveM Market
+        neon: {
+          green: "hsl(var(--neon-green))",
+          blue: "hsl(var(--neon-blue))",
+          purple: "hsl(var(--neon-purple))",
+          pink: "hsl(var(--neon-pink))",
+          cyan: "hsl(var(--neon-cyan))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
