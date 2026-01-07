@@ -105,16 +105,23 @@ export const CartDrawer = ({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => onUpdateQuantity(cartItem.item.id, cartItem.quantity - 1)}
-                      className="p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                      className="p-1.5 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
-                    <span className="w-8 text-center font-medium">
-                      {cartItem.quantity}
-                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      value={cartItem.quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 1;
+                        onUpdateQuantity(cartItem.item.id, Math.max(1, val));
+                      }}
+                      className="w-12 text-center font-medium bg-muted/30 border border-border/50 rounded px-1 py-0.5 text-sm focus:border-primary/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
                     <button
                       onClick={() => onUpdateQuantity(cartItem.item.id, cartItem.quantity + 1)}
-                      className="p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                      className="p-1.5 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                     </button>

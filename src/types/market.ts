@@ -33,6 +33,8 @@ export interface MarketConfig {
   name: string;
   categories: Category[];
   items: MarketItem[];
+  ownerId?: string; // Market sahibi ID
+  ownerName?: string; // Market sahibi adı
 }
 
 export interface PlayerBalance {
@@ -60,4 +62,26 @@ export interface PurchaseData {
   items: { itemId: string; quantity: number }[];
   paymentMethod: PaymentMethod;
   totalPrice: number;
+}
+
+// Sales Statistics Types
+export interface SaleRecord {
+  itemId: string;
+  itemName: string;
+  quantity: number;
+  date: string; // YYYY-MM-DD format
+}
+
+export interface DailySales {
+  date: string;
+  items: { [itemId: string]: number }; // itemId -> quantity
+  total: number;
+}
+
+// Market Transfer Types
+export interface MarketTransfer {
+  fromOwnerId: string;
+  toOwnerId: string;
+  toOwnerName: string;
+  marketId: string;
 }
