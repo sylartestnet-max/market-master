@@ -14,12 +14,12 @@ export const demoMarkets: Record<string, MarketConfig> = {
     ],
     items: [
       // Yiyecek
-      { id: 'burger', name: 'Burger', description: 'Lezzetli ızgara burger', price: 25, image: '🍔', category: 'food' },
-      { id: 'pizza', name: 'Pizza Dilimi', description: 'Sıcak peynirli pizza', price: 30, image: '🍕', category: 'food' },
-      { id: 'hotdog', name: 'Sosisli', description: 'Klasik sokak lezzeti', price: 15, image: '🌭', category: 'food' },
-      { id: 'sandwich', name: 'Sandviç', description: 'Taze malzemelerle', price: 20, image: '🥪', category: 'food' },
-      { id: 'donut', name: 'Donut', description: 'Tatlı ve yumuşak', price: 10, image: '🍩', category: 'food' },
-      { id: 'fries', name: 'Patates Kızartması', description: 'Çıtır çıtır', price: 12, image: '🍟', category: 'food' },
+      { id: 'burger', name: 'Burger', description: 'Lezzetli ızgara burger', detailedDescription: 'Bu lezzetli ızgara burger açlık barınızı %30 oranında doldurur. Taze malzemeler ve özel sosla hazırlanmıştır.', usageInfo: 'Envanterinizden kullanarak açlık seviyenizi artırabilirsiniz. Araç sürerken veya koşarken kullanılamaz.', price: 25, image: '🍔', category: 'food' },
+      { id: 'pizza', name: 'Pizza Dilimi', description: 'Sıcak peynirli pizza', detailedDescription: 'İtalyan usulü hazırlanan bu pizza dilimi açlık barınızı %25 oranında doldurur.', usageInfo: 'Envanterinizden kullanın. En iyi sonuç için oturarak yiyin.', price: 30, image: '🍕', category: 'food' },
+      { id: 'hotdog', name: 'Sosisli', description: 'Klasik sokak lezzeti', detailedDescription: 'Klasik Amerikan hot dog, açlık barınızı %15 doldurur. Hızlı ve pratik bir seçenek.', usageInfo: 'Yürürken bile yiyebilirsiniz. Hızlı enerji için idealdir.', price: 15, image: '🌭', category: 'food' },
+      { id: 'sandwich', name: 'Sandviç', description: 'Taze malzemelerle', detailedDescription: 'Taze sebzeler ve kaliteli etlerle hazırlanan sandviç. Açlık barınızı %20 doldurur.', usageInfo: 'Envanterinizden kullanın. Sağlık regenerasyonunu hafif artırır.', price: 20, image: '🥪', category: 'food' },
+      { id: 'donut', name: 'Donut', description: 'Tatlı ve yumuşak', detailedDescription: 'Şekerli ve yumuşak bu tatlı, açlık barınızı %10 doldurur. Polis departmanının favorisi!', usageInfo: 'Hızlı şeker takviyesi sağlar. Koşu hızınızı geçici olarak artırabilir.', price: 10, image: '🍩', category: 'food' },
+      { id: 'fries', name: 'Patates Kızartması', description: 'Çıtır çıtır', detailedDescription: 'Çıtır çıtır patates kızartması. Açlık barınızı %12 doldurur.', usageInfo: 'Yanık bir yemek olarak tek başına veya burger ile birlikte tüketilebilir.', price: 12, image: '🍟', category: 'food' },
       
       // İçecek
       { id: 'cola', name: 'Cola', description: 'Soğuk ve ferahlatıcı', price: 8, image: '🥤', category: 'drinks' },
@@ -109,6 +109,8 @@ export const demoMarkets: Record<string, MarketConfig> = {
 export const demoBalance: PlayerBalance = {
   cash: 5000,
   bank: 25000,
+  points: 350,
+  minPointWithdraw: 500,
 };
 
 // Get default market

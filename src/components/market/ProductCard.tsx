@@ -7,15 +7,20 @@ import { Button } from '@/components/ui/button';
 interface ProductCardProps {
   item: MarketItem;
   onAddToCart: (item: MarketItem, quantity: number) => void;
+  onImageClick: (item: MarketItem) => void;
   animationDelay?: number;
 }
 
-export const ProductCard = ({ item, onAddToCart, animationDelay = 0 }: ProductCardProps) => {
+export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 0 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState<1 | 10>(1);
 
   const handleAddToCart = () => {
     onAddToCart(item, selectedQuantity);
+  };
+
+  const handleImageClick = () => {
+    onImageClick(item);
   };
 
   return (
@@ -39,8 +44,11 @@ export const ProductCard = ({ item, onAddToCart, animationDelay = 0 }: ProductCa
       
       {/* Content */}
       <div className="relative p-4 flex flex-col gap-3">
-        {/* Item Image/Icon */}
-        <div className="relative flex justify-center py-4">
+        {/* Item Image/Icon - Clickable */}
+        <div 
+          className="relative flex justify-center py-4 cursor-pointer"
+          onClick={handleImageClick}
+        >
           <span 
             className={cn(
               "text-6xl transition-all duration-300",
@@ -53,6 +61,15 @@ export const ProductCard = ({ item, onAddToCart, animationDelay = 0 }: ProductCa
           >
             {item.image}
           </span>
+          {/* Click hint */}
+          <div className={cn(
+            "absolute bottom-0 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-xs",
+            "bg-primary/20 text-primary border border-primary/30",
+            "opacity-0 transition-opacity duration-300",
+            isHovered && "opacity-100"
+          )}>
+            Detay için tıkla
+          </div>
         </div>
         
         {/* Item Info */}
