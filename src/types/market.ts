@@ -4,10 +4,17 @@ export interface MarketItem {
   id: string;
   name: string;
   description: string;
+  detailedDescription?: string; // Ne işe yarar, nerede kullanılır
+  usageInfo?: string; // Kullanım bilgisi
   price: number;
   image: string;
   category: string;
   stock?: number; // Optional: for limited stock items
+}
+
+export interface PlayerPoints {
+  points: number;
+  minWithdraw: number; // Minimum çekim miktarı
 }
 
 export interface Category {
@@ -31,6 +38,8 @@ export interface MarketConfig {
 export interface PlayerBalance {
   cash: number;
   bank: number;
+  points: number;
+  minPointWithdraw: number;
 }
 
 export type PaymentMethod = 'cash' | 'bank';

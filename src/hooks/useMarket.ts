@@ -83,6 +83,7 @@ export const useMarket = () => {
     isOpen,
     config,
     balance,
+    setBalance,
     selectedCategory,
     setSelectedCategory,
     filteredItems,

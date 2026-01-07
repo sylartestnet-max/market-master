@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMarket } from '@/hooks/useMarket';
 import { useCart } from '@/hooks/useCart';
 import { cn } from '@/lib/utils';
-import { ShoppingCart, X } from 'lucide-react';
+import { ShoppingCart, X, Coins } from 'lucide-react';
+import { MarketItem } from '@/types/market';
 
 import { BalanceDisplay } from './BalanceDisplay';
 import { CategorySidebar } from './CategorySidebar';
@@ -10,14 +11,22 @@ import { ProductGrid } from './ProductGrid';
 import { CartDrawer } from './CartDrawer';
 import { NotificationToast } from './NotificationToast';
 import { MarketSelector } from './MarketSelector';
+import { SearchBar } from './SearchBar';
+import { PointsPanel } from './PointsPanel';
+import { ItemDetailModal } from './ItemDetailModal';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const MarketUI = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isPointsPanelOpen, setIsPointsPanelOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MarketItem | null>(null);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   
   const {
     config,
     balance,
+    setBalance,
     selectedCategory,
     setSelectedCategory,
     filteredItems,
@@ -27,6 +36,7 @@ export const MarketUI = () => {
     switchMarket,
     availableMarkets,
     closeMarket,
+    showNotification,
   } = useMarket();
   
   const {
@@ -42,6 +52,17 @@ export const MarketUI = () => {
     getCartData,
   } = useCart();
 
+  // Filter items by search query
+  const displayItems = useMemo(() => {
+    if (!searchQuery.trim()) return filteredItems;
+    
+    const query = searchQuery.toLowerCase();
+    return config.items.filter(item => 
+      item.name.toLowerCase().includes(query) ||
+      item.description.toLowerCase().includes(query)
+    );
+  }, [filteredItems, searchQuery, config.items]);
+
   const handlePurchaseClick = () => {
     const cartData = getCartData();
     const success = handlePurchase(
@@ -51,9 +72,36 @@ export const MarketUI = () => {
     );
     
     if (success) {
+      // Calculate points earned (5% of total)
+      const pointsEarned = Math.floor(cartData.totalPrice * 0.05);
+      if (pointsEarned > 0) {
+        setBalance(prev => ({
+          ...prev,
+          points: prev.points + pointsEarned
+        }));
+        showNotification(`+${pointsEarned} puan kazandınız!`, 'success');
+      }
+      
       clearCart();
       setIsCartOpen(false);
     }
+  };
+
+  const handlePointsWithdraw = (amount: number) => {
+    if (amount <= balance.points && amount >= balance.minPointWithdraw) {
+      setBalance(prev => ({
+        ...prev,
+        points: prev.points - amount,
+        bank: prev.bank + amount
+      }));
+      showNotification(`${amount.toLocaleString()} puan bankaya aktarıldı!`, 'success');
+      setIsPointsPanelOpen(false);
+    }
+  };
+
+  const handleImageClick = (item: MarketItem) => {
+    setSelectedItem(item);
+    setIsItemModalOpen(true);
   };
 
   const isAffordable = canAfford(totalPrice, paymentMethod);
@@ -63,9 +111,9 @@ export const MarketUI = () => {
       {/* Main Container with Animated Border */}
       <div className="relative w-full max-w-7xl h-[85vh] rounded-2xl overflow-hidden animated-border">
         {/* Inner Container */}
-        <div className="absolute inset-[2px] rounded-2xl glass-darker flex flex-col overflow-hidden">
+        <div className="absolute inset-[4px] rounded-2xl glass-darker flex flex-col overflow-hidden">
           {/* Header Bar */}
-          <header className="flex items-center justify-between p-4 border-b border-border/50">
+          <header className="flex items-center justify-between p-4 border-b-2 border-border/50">
             {/* Left: Market Selector */}
             <MarketSelector
               currentMarket={config.id}
@@ -73,13 +121,29 @@ export const MarketUI = () => {
               onSelect={switchMarket}
             />
             
-            {/* Center: Market Name */}
-            <h1 className="text-2xl font-bold text-foreground">
-              <span className="text-primary neon-text">{config.name}</span>
-            </h1>
+            {/* Center: Market Name & Search */}
+            <div className="flex flex-col items-center gap-2">
+              <h1 className="text-2xl font-bold text-foreground">
+                <span className="text-primary neon-text">{config.name}</span>
+              </h1>
+            </div>
             
-            {/* Right: Balance & Cart */}
+            {/* Right: Balance, Points & Cart */}
             <div className="flex items-center gap-4">
+              {/* Points Button */}
+              <button
+                onClick={() => setIsPointsPanelOpen(true)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg",
+                  "bg-secondary/20 border border-secondary/50 text-secondary",
+                  "hover:bg-secondary/30 transition-all duration-300",
+                  "hover:neon-glow-purple hover:scale-105"
+                )}
+              >
+                <Coins className="w-4 h-4" />
+                <span className="font-medium">{balance.points.toLocaleString()}</span>
+              </button>
+              
               <BalanceDisplay balance={balance} />
               
               {/* Cart Button */}
@@ -113,22 +177,37 @@ export const MarketUI = () => {
             </div>
           </header>
           
+          {/* Search Bar - Below Header */}
+          <div className="px-4 py-3 border-b border-border/30">
+            <div className="max-w-md mx-auto">
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Ürün ara... (isim veya açıklama)"
+              />
+            </div>
+          </div>
+          
           {/* Main Content */}
           <div className="flex flex-1 overflow-hidden">
             {/* Category Sidebar */}
-            <div className="p-4">
+            <div className="p-4 border-r-2 border-border/30">
               <CategorySidebar
                 categories={config.categories}
                 selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
+                onSelectCategory={(cat) => {
+                  setSelectedCategory(cat);
+                  setSearchQuery(''); // Clear search when changing category
+                }}
               />
             </div>
             
             {/* Product Grid */}
             <ScrollArea className="flex-1">
               <ProductGrid
-                items={filteredItems}
+                items={displayItems}
                 onAddToCart={addItem}
+                onImageClick={handleImageClick}
               />
             </ScrollArea>
           </div>
@@ -148,6 +227,23 @@ export const MarketUI = () => {
         balance={balance}
         onPurchase={handlePurchaseClick}
         canAfford={isAffordable}
+      />
+      
+      {/* Points Panel */}
+      <PointsPanel
+        isOpen={isPointsPanelOpen}
+        onClose={() => setIsPointsPanelOpen(false)}
+        points={balance.points}
+        minWithdraw={balance.minPointWithdraw}
+        onWithdraw={handlePointsWithdraw}
+      />
+      
+      {/* Item Detail Modal */}
+      <ItemDetailModal
+        item={selectedItem}
+        isOpen={isItemModalOpen}
+        onClose={() => setIsItemModalOpen(false)}
+        onAddToCart={addItem}
       />
       
       {/* Notification Toast */}

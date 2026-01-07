@@ -5,9 +5,10 @@ import { PackageOpen } from 'lucide-react';
 interface ProductGridProps {
   items: MarketItem[];
   onAddToCart: (item: MarketItem, quantity: number) => void;
+  onImageClick: (item: MarketItem) => void;
 }
 
-export const ProductGrid = ({ items, onAddToCart }: ProductGridProps) => {
+export const ProductGrid = ({ items, onAddToCart, onImageClick }: ProductGridProps) => {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4 text-muted-foreground">
@@ -24,6 +25,7 @@ export const ProductGrid = ({ items, onAddToCart }: ProductGridProps) => {
           key={item.id}
           item={item}
           onAddToCart={onAddToCart}
+          onImageClick={onImageClick}
           animationDelay={index * 0.5}
         />
       ))}
