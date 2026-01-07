@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useMarket } from '@/hooks/useMarket';
 import { useCart } from '@/hooks/useCart';
+import { useSalesData } from '@/hooks/useSalesData';
 import { cn } from '@/lib/utils';
-import { ShoppingCart, X, Coins } from 'lucide-react';
+import { ShoppingCart, X, Coins, TrendingUp, ArrowRightLeft } from 'lucide-react';
 import { MarketItem } from '@/types/market';
 
 import { BalanceDisplay } from './BalanceDisplay';
@@ -14,6 +15,8 @@ import { MarketSelector } from './MarketSelector';
 import { SearchBar } from './SearchBar';
 import { PointsPanel } from './PointsPanel';
 import { ItemDetailModal } from './ItemDetailModal';
+import { SalesChart } from './SalesChart';
+import { MarketTransferPanel } from './MarketTransferPanel';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const MarketUI = () => {
@@ -22,6 +25,8 @@ export const MarketUI = () => {
   const [isPointsPanelOpen, setIsPointsPanelOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MarketItem | null>(null);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+  const [isSalesChartOpen, setIsSalesChartOpen] = useState(false);
+  const [isTransferPanelOpen, setIsTransferPanelOpen] = useState(false);
   
   const {
     config,
@@ -37,6 +42,8 @@ export const MarketUI = () => {
     availableMarkets,
     closeMarket,
     showNotification,
+    transferMarket,
+    marketOwner,
   } = useMarket();
   
   const {
@@ -51,6 +58,8 @@ export const MarketUI = () => {
     totalItems,
     getCartData,
   } = useCart();
+
+  const { salesData, itemNames, recordSale } = useSalesData();
 
   // Filter items by search query
   const displayItems = useMemo(() => {
@@ -72,6 +81,14 @@ export const MarketUI = () => {
     );
     
     if (success) {
+      // Record sales
+      cartData.items.forEach(item => {
+        const marketItem = config.items.find(i => i.id === item.itemId);
+        if (marketItem) {
+          recordSale(item.itemId, marketItem.name, item.quantity);
+        }
+      });
+
       // Calculate points earned (5% of total)
       const pointsEarned = Math.floor(cartData.totalPrice * 0.05);
       if (pointsEarned > 0) {
@@ -104,6 +121,12 @@ export const MarketUI = () => {
     setIsItemModalOpen(true);
   };
 
+  const handleMarketTransfer = (newOwnerId: string, newOwnerName: string) => {
+    transferMarket(newOwnerId, newOwnerName);
+    showNotification(`Market ${newOwnerName} kişisine devredildi!`, 'success');
+    setIsTransferPanelOpen(false);
+  };
+
   const isAffordable = canAfford(totalPrice, paymentMethod);
 
   return (
@@ -121,15 +144,48 @@ export const MarketUI = () => {
               onSelect={switchMarket}
             />
             
-            {/* Center: Market Name & Search */}
-            <div className="flex flex-col items-center gap-2">
+            {/* Center: Market Name & Owner */}
+            <div className="flex flex-col items-center gap-1">
               <h1 className="text-2xl font-bold text-foreground">
                 <span className="text-primary neon-text">{config.name}</span>
               </h1>
+              {marketOwner && (
+                <p className="text-xs text-muted-foreground">
+                  Sahip: <span className="text-secondary">{marketOwner}</span>
+                </p>
+              )}
             </div>
             
-            {/* Right: Balance, Points & Cart */}
-            <div className="flex items-center gap-4">
+            {/* Right: Balance, Points, Stats & Cart */}
+            <div className="flex items-center gap-3">
+              {/* Sales Chart Button */}
+              <button
+                onClick={() => setIsSalesChartOpen(true)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg",
+                  "bg-accent/20 border border-accent/50 text-accent",
+                  "hover:bg-accent/30 transition-all duration-300",
+                  "hover:scale-105"
+                )}
+                title="Satış İstatistikleri"
+              >
+                <TrendingUp className="w-4 h-4" />
+              </button>
+
+              {/* Transfer Button */}
+              <button
+                onClick={() => setIsTransferPanelOpen(true)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg",
+                  "bg-secondary/20 border border-secondary/50 text-secondary",
+                  "hover:bg-secondary/30 transition-all duration-300",
+                  "hover:scale-105"
+                )}
+                title="Marketi Devret"
+              >
+                <ArrowRightLeft className="w-4 h-4" />
+              </button>
+
               {/* Points Button */}
               <button
                 onClick={() => setIsPointsPanelOpen(true)}
@@ -244,6 +300,23 @@ export const MarketUI = () => {
         isOpen={isItemModalOpen}
         onClose={() => setIsItemModalOpen(false)}
         onAddToCart={addItem}
+      />
+
+      {/* Sales Chart */}
+      <SalesChart
+        isOpen={isSalesChartOpen}
+        onClose={() => setIsSalesChartOpen(false)}
+        salesData={salesData}
+        itemNames={itemNames}
+      />
+
+      {/* Market Transfer Panel */}
+      <MarketTransferPanel
+        isOpen={isTransferPanelOpen}
+        onClose={() => setIsTransferPanelOpen(false)}
+        marketName={config.name}
+        currentOwner={marketOwner}
+        onTransfer={handleMarketTransfer}
       />
       
       {/* Notification Toast */}

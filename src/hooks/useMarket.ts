@@ -8,12 +8,14 @@ export const useMarket = () => {
   const [balance, setBalance] = useState<PlayerBalance>(demoBalance);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [marketOwner, setMarketOwner] = useState<string | undefined>(undefined);
 
   // Set default category when config changes
   useEffect(() => {
     if (config.categories.length > 0 && !selectedCategory) {
       setSelectedCategory(config.categories[0].id);
     }
+    setMarketOwner(config.ownerName);
   }, [config, selectedCategory]);
 
   // Filter items by selected category
@@ -68,6 +70,21 @@ export const useMarket = () => {
     return true;
   }, [canAfford, showNotification]);
 
+  // Transfer market to new owner
+  const transferMarket = useCallback((newOwnerId: string, newOwnerName: string) => {
+    setConfig(prev => ({
+      ...prev,
+      ownerId: newOwnerId,
+      ownerName: newOwnerName,
+    }));
+    setMarketOwner(newOwnerName);
+    
+    // In real FiveM, this would send NUI callback to server
+    // The new owner would get 5% bonus points on all sales
+    console.log(`Market transferred to ${newOwnerName} (ID: ${newOwnerId})`);
+    console.log('New owner will receive 5% bonus points on all sales');
+  }, []);
+
   // Switch market (for demo)
   const switchMarket = useCallback((marketId: string) => {
     openMarket(marketId);
@@ -95,5 +112,7 @@ export const useMarket = () => {
     showNotification,
     switchMarket,
     availableMarkets,
+    transferMarket,
+    marketOwner,
   };
 };
