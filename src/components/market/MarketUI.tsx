@@ -3,7 +3,7 @@ import { useMarket } from '@/hooks/useMarket';
 import { useCart } from '@/hooks/useCart';
 import { useSalesData } from '@/hooks/useSalesData';
 import { cn } from '@/lib/utils';
-import { ShoppingCart, X, Percent } from 'lucide-react';
+import { ShoppingCart, X } from 'lucide-react';
 import { MarketItem } from '@/types/market';
 
 import { BalanceDisplay } from './BalanceDisplay';
@@ -184,14 +184,7 @@ export const MarketUI = () => {
             </div>
             
             {/* Right: Balance & Cart */}
-            <div className="flex items-center gap-4">
-              {/* Daily Discount Badge */}
-              {dailyDiscountItemId && (
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-destructive/20 border border-destructive/40 text-destructive">
-                  <Percent className="w-4 h-4" />
-                  <span className="text-sm font-medium">Günün İndirimi: %5</span>
-                </div>
-              )}
+            <div className="flex items-center gap-3">
 
               <BalanceDisplay 
                 balance={balance} 
