@@ -1,15 +1,14 @@
-import { useMemo } from 'react';
-import { X, TrendingUp } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { X, TrendingUp, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DailySales } from '@/types/market';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SalesChartProps {
   isOpen: boolean;
@@ -19,9 +18,10 @@ interface SalesChartProps {
 }
 
 export const SalesChart = ({ isOpen, onClose, salesData, itemNames }: SalesChartProps) => {
-  // Transform data for chart - show top 5 items
-  const chartData = useMemo(() => {
-    // Aggregate all items across all days
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  // Get all items with their totals
+  const allItemsWithTotals = useMemo(() => {
     const itemTotals: { [itemId: string]: number } = {};
     salesData.forEach(day => {
       Object.entries(day.items).forEach(([itemId, qty]) => {
@@ -29,58 +29,30 @@ export const SalesChart = ({ isOpen, onClose, salesData, itemNames }: SalesChart
       });
     });
 
-    // Get top 5 items by total sales
-    const topItems = Object.entries(itemTotals)
+    return Object.entries(itemTotals)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([id]) => id);
-
-    // Create daily data with top items
-    return salesData.map(day => {
-      const dayData: { [key: string]: string | number } = {
-        date: formatDate(day.date),
-        fullDate: day.date,
-      };
-      topItems.forEach(itemId => {
-        dayData[itemId] = day.items[itemId] || 0;
-      });
-      return dayData;
-    });
-  }, [salesData]);
-
-  // Get unique items for chart config
-  const chartConfig = useMemo(() => {
-    const itemTotals: { [itemId: string]: number } = {};
-    salesData.forEach(day => {
-      Object.entries(day.items).forEach(([itemId, qty]) => {
-        itemTotals[itemId] = (itemTotals[itemId] || 0) + qty;
-      });
-    });
-
-    const topItems = Object.entries(itemTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([id]) => id);
-
-    const colors = [
-      'hsl(var(--primary))',
-      'hsl(var(--secondary))',
-      'hsl(var(--accent))',
-      'hsl(142, 76%, 36%)',
-      'hsl(48, 96%, 53%)',
-    ];
-
-    const config: { [key: string]: { label: string; color: string } } = {};
-    topItems.forEach((itemId, index) => {
-      config[itemId] = {
-        label: itemNames[itemId] || itemId,
-        color: colors[index % colors.length],
-      };
-    });
-    return config;
+      .map(([id, total]) => ({ id, name: itemNames[id] || id, total }));
   }, [salesData, itemNames]);
 
-  const topItemIds = Object.keys(chartConfig);
+  // Get daily data for selected item
+  const selectedItemData = useMemo(() => {
+    if (!selectedItemId) return [];
+    
+    return salesData.map(day => ({
+      date: formatDate(day.date),
+      fullDate: day.date,
+      quantity: day.items[selectedItemId] || 0,
+    }));
+  }, [salesData, selectedItemId]);
+
+  const selectedItem = allItemsWithTotals.find(item => item.id === selectedItemId);
+
+  const chartConfig = {
+    quantity: {
+      label: 'Satış Adedi',
+      color: 'hsl(var(--primary))',
+    },
+  };
 
   if (!isOpen) return null;
 
@@ -98,7 +70,7 @@ export const SalesChart = ({ isOpen, onClose, salesData, itemNames }: SalesChart
         <div className="flex items-center justify-between p-4 border-b border-border/50">
           <div className="flex items-center gap-3">
             <TrendingUp className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-bold text-primary neon-text">
+            <h2 className="text-xl font-bold text-primary">
               Haftalık Satış İstatistikleri
             </h2>
           </div>
@@ -110,73 +82,121 @@ export const SalesChart = ({ isOpen, onClose, salesData, itemNames }: SalesChart
           </button>
         </div>
 
-        {/* Chart */}
-        <div className="p-6">
-          {salesData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <TrendingUp className="w-16 h-16 opacity-30 mb-4" />
-              <p>Henüz satış verisi bulunmuyor</p>
+        {/* Content - Two Column Layout */}
+        <div className="flex h-[500px]">
+          {/* Left: Item List */}
+          <div className="w-64 border-r border-border/30">
+            <div className="p-3 border-b border-border/30">
+              <p className="text-sm font-medium text-muted-foreground">Ürün Listesi</p>
             </div>
-          ) : (
-            <ChartContainer config={chartConfig} className="h-[400px] w-full">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis
-                  dataKey="date"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${value}`}
-                />
-                <ChartTooltip
-                  content={<ChartTooltipContent />}
-                  cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-                {topItemIds.map((itemId, index) => (
-                  <Bar
-                    key={itemId}
-                    dataKey={itemId}
-                    fill={chartConfig[itemId]?.color || 'hsl(var(--primary))'}
-                    radius={[4, 4, 0, 0]}
-                    stackId="sales"
-                  />
-                ))}
-              </BarChart>
-            </ChartContainer>
-          )}
-        </div>
+            <ScrollArea className="h-[calc(100%-44px)]">
+              <div className="p-2 space-y-1">
+                {allItemsWithTotals.length === 0 ? (
+                  <div className="p-4 text-center text-muted-foreground text-sm">
+                    Henüz satış yok
+                  </div>
+                ) : (
+                  allItemsWithTotals.map(item => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelectedItemId(item.id)}
+                      className={cn(
+                        "w-full flex items-center justify-between p-3 rounded-lg text-left transition-all",
+                        "hover:bg-primary/10",
+                        selectedItemId === item.id
+                          ? "bg-primary/20 border border-primary/40"
+                          : "bg-muted/30 border border-transparent"
+                      )}
+                    >
+                      <span className={cn(
+                        "text-sm font-medium truncate",
+                        selectedItemId === item.id ? "text-primary" : "text-foreground"
+                      )}>
+                        {item.name}
+                      </span>
+                      <span className={cn(
+                        "text-xs font-bold px-2 py-0.5 rounded-full",
+                        selectedItemId === item.id
+                          ? "bg-primary/30 text-primary"
+                          : "bg-muted text-muted-foreground"
+                      )}>
+                        {item.total}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
 
-        {/* Summary */}
-        <div className="px-6 pb-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {topItemIds.map(itemId => {
-              const total = salesData.reduce((sum, day) => sum + (day.items[itemId] || 0), 0);
-              return (
-                <div
-                  key={itemId}
-                  className="p-3 rounded-lg glass border border-border/50"
-                  style={{ borderColor: chartConfig[itemId]?.color }}
-                >
-                  <p className="text-xs text-muted-foreground truncate">
-                    {chartConfig[itemId]?.label}
-                  </p>
-                  <p
-                    className="text-lg font-bold"
-                    style={{ color: chartConfig[itemId]?.color }}
-                  >
-                    {total} adet
-                  </p>
+          {/* Right: Chart & Details */}
+          <div className="flex-1 flex flex-col">
+            {!selectedItemId ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
+                <Package className="w-16 h-16 opacity-30 mb-4" />
+                <p>Detayları görmek için sol taraftan ürün seçin</p>
+              </div>
+            ) : (
+              <>
+                {/* Selected Item Header */}
+                <div className="p-4 border-b border-border/30">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">{selectedItem?.name}</h3>
+                      <p className="text-sm text-muted-foreground">Son 7 günlük satış grafiği</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-primary">{selectedItem?.total}</p>
+                      <p className="text-xs text-muted-foreground">Toplam Satış</p>
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
+
+                {/* Chart */}
+                <div className="flex-1 p-4">
+                  <ChartContainer config={chartConfig} className="h-full w-full">
+                    <BarChart data={selectedItemData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                      <XAxis
+                        dataKey="date"
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        allowDecimals={false}
+                      />
+                      <ChartTooltip
+                        content={<ChartTooltipContent />}
+                        cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
+                      />
+                      <Bar
+                        dataKey="quantity"
+                        fill="hsl(var(--primary))"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+
+                {/* Daily Breakdown */}
+                <div className="p-4 border-t border-border/30">
+                  <div className="grid grid-cols-7 gap-2">
+                    {selectedItemData.map((day, i) => (
+                      <div key={i} className="text-center p-2 rounded-lg bg-muted/30">
+                        <p className="text-xs text-muted-foreground">{day.date}</p>
+                        <p className="text-sm font-bold text-primary">{day.quantity}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

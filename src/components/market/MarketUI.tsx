@@ -3,7 +3,7 @@ import { useMarket } from '@/hooks/useMarket';
 import { useCart } from '@/hooks/useCart';
 import { useSalesData } from '@/hooks/useSalesData';
 import { cn } from '@/lib/utils';
-import { ShoppingCart, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { MarketItem } from '@/types/market';
 
 import { BalanceDisplay } from './BalanceDisplay';
@@ -185,31 +185,14 @@ export const MarketUI = () => {
             
             {/* Right: Balance & Cart */}
             <div className="flex items-center gap-3">
-
               <BalanceDisplay 
                 balance={balance} 
                 onPointsClick={() => setIsPointsPanelOpen(true)}
                 onStatsClick={() => setIsSalesChartOpen(true)}
                 onTransferClick={() => setIsTransferPanelOpen(true)}
+                onCartClick={() => setIsCartOpen(true)}
+                cartItemCount={totalItems}
               />
-              
-              {/* Cart Button */}
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className={cn(
-                  "relative flex items-center gap-2 px-4 py-2 rounded-lg",
-                  "bg-primary/20 border border-primary/50 text-primary",
-                  "hover:bg-primary/30 transition-all duration-300"
-                )}
-              >
-                <ShoppingCart className="w-5 h-5" />
-                <span className="font-medium">Sepet</span>
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-secondary text-secondary-foreground text-xs font-bold flex items-center justify-center">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
               
               {/* Close Button (for FiveM) */}
               <button
