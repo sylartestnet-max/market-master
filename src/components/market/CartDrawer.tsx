@@ -151,8 +151,16 @@ export const CartDrawer = ({
             {/* Total */}
             <div className="flex items-center justify-between p-4 rounded-lg bg-primary/10 border border-primary/30">
               <span className="text-lg font-medium text-foreground">Toplam</span>
-              <span className="text-2xl font-bold text-primary neon-text">
+              <span className="text-2xl font-bold text-primary">
                 ${totalPrice.toLocaleString()}
+              </span>
+            </div>
+
+            {/* Points to be earned */}
+            <div className="flex items-center justify-between px-4 py-2 rounded-lg bg-secondary/10 border border-secondary/30">
+              <span className="text-sm text-muted-foreground">Kazanılacak Puan</span>
+              <span className="font-bold text-secondary">
+                +{Math.floor(totalPrice * 0.05).toLocaleString()} puan
               </span>
             </div>
             
@@ -173,7 +181,7 @@ export const CartDrawer = ({
                 "bg-gradient-to-r from-primary to-accent hover:from-primary/80 hover:to-accent/80",
                 "text-primary-foreground",
                 "transition-all duration-300",
-                canAfford && items.length > 0 && "hover:scale-[1.02] hover:neon-glow"
+                canAfford && items.length > 0 && "hover:scale-[1.02]"
               )}
             >
               <CreditCard className="w-5 h-5" />

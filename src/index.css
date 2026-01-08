@@ -6,54 +6,54 @@
 
 @layer base {
   :root {
-    --background: 220 20% 6%;
-    --foreground: 180 100% 90%;
+    --background: 220 15% 8%;
+    --foreground: 210 20% 90%;
 
-    --card: 220 25% 8%;
-    --card-foreground: 180 100% 90%;
+    --card: 220 18% 10%;
+    --card-foreground: 210 20% 90%;
 
-    --popover: 220 25% 10%;
-    --popover-foreground: 180 100% 90%;
+    --popover: 220 18% 12%;
+    --popover-foreground: 210 20% 90%;
 
-    --primary: 160 100% 50%;
-    --primary-foreground: 220 20% 6%;
+    --primary: 145 60% 45%;
+    --primary-foreground: 220 15% 8%;
 
-    --secondary: 280 100% 60%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 35 70% 50%;
+    --secondary-foreground: 220 15% 8%;
 
-    --muted: 220 20% 15%;
-    --muted-foreground: 180 30% 60%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 210 15% 55%;
 
-    --accent: 200 100% 55%;
-    --accent-foreground: 220 20% 6%;
+    --accent: 195 70% 45%;
+    --accent-foreground: 220 15% 8%;
 
-    --destructive: 0 80% 55%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 180 50% 20%;
-    --input: 220 20% 12%;
-    --ring: 160 100% 50%;
+    --border: 220 20% 22%;
+    --input: 220 15% 14%;
+    --ring: 145 60% 45%;
 
     --radius: 0.75rem;
 
-    /* Neon Colors */
-    --neon-green: 160 100% 50%;
-    --neon-blue: 200 100% 55%;
-    --neon-purple: 280 100% 60%;
-    --neon-pink: 320 100% 60%;
-    --neon-cyan: 180 100% 50%;
+    /* Professional Accent Colors */
+    --neon-green: 145 60% 45%;
+    --neon-blue: 195 70% 45%;
+    --neon-purple: 35 70% 50%;
+    --neon-pink: 350 60% 55%;
+    --neon-cyan: 185 60% 45%;
 
     /* Gradient variables */
-    --gradient-neon: linear-gradient(135deg, hsl(280 100% 60%), hsl(200 100% 55%), hsl(160 100% 50%));
+    --gradient-neon: linear-gradient(135deg, hsl(35 70% 50%), hsl(195 70% 45%), hsl(145 60% 45%));
 
-    --sidebar-background: 220 25% 8%;
-    --sidebar-foreground: 180 100% 90%;
-    --sidebar-primary: 160 100% 50%;
-    --sidebar-primary-foreground: 220 20% 6%;
-    --sidebar-accent: 220 20% 12%;
-    --sidebar-accent-foreground: 180 100% 90%;
-    --sidebar-border: 180 50% 20%;
-    --sidebar-ring: 160 100% 50%;
+    --sidebar-background: 220 18% 10%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 145 60% 45%;
+    --sidebar-primary-foreground: 220 15% 8%;
+    --sidebar-accent: 220 15% 14%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 20% 22%;
+    --sidebar-ring: 145 60% 45%;
   }
 }
 

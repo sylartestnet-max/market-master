@@ -29,12 +29,19 @@ export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 
         "relative group rounded-xl overflow-hidden transition-all duration-300",
         "glass border border-border/50",
         "hover:border-primary/60 hover:scale-105",
-        isHovered && "neon-glow"
+        item.hasDiscount && "ring-2 ring-destructive/50"
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{ animationDelay: `${animationDelay}ms` }}
     >
+      {/* Discount Badge */}
+      {item.hasDiscount && (
+        <div className="absolute top-2 right-2 z-10 px-2 py-1 rounded-md bg-destructive text-destructive-foreground text-xs font-bold">
+          %5 İNDİRİM
+        </div>
+      )}
+
       {/* Animated Border Overlay */}
       <div className={cn(
         "absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none",
@@ -76,7 +83,7 @@ export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 
         <div className="space-y-1">
           <h4 className={cn(
             "font-bold text-lg transition-colors",
-            isHovered ? "text-primary neon-text" : "text-foreground"
+            isHovered ? "text-primary" : "text-foreground"
           )}>
             {item.name}
           </h4>
@@ -87,12 +94,18 @@ export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 
         
         {/* Price Tag */}
         <div className="flex items-center justify-between">
-          <div className={cn(
-            "px-3 py-1 rounded-full text-sm font-bold",
-            "bg-primary/20 text-primary border border-primary/40",
-            isHovered && "pulse-glow"
-          )}>
-            ${item.price.toLocaleString()}
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              "px-3 py-1 rounded-full text-sm font-bold",
+              "bg-primary/20 text-primary border border-primary/40"
+            )}>
+              ${item.price.toLocaleString()}
+            </div>
+            {item.hasDiscount && item.originalPrice && (
+              <span className="text-sm text-muted-foreground line-through">
+                ${item.originalPrice.toLocaleString()}
+              </span>
+            )}
           </div>
           
           {/* Quantity Selector */}
@@ -130,7 +143,7 @@ export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 
           className={cn(
             "w-full mt-2 gap-2 transition-all duration-300",
             "bg-primary/20 hover:bg-primary/40 text-primary border border-primary/50",
-            "hover:neon-glow hover:scale-[1.02]"
+            "hover:scale-[1.02]"
           )}
         >
           <ShoppingCart className="w-4 h-4" />

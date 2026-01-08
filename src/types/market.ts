@@ -7,6 +7,8 @@ export interface MarketItem {
   detailedDescription?: string; // Ne işe yarar, nerede kullanılır
   usageInfo?: string; // Kullanım bilgisi
   price: number;
+  originalPrice?: number; // Discount için orijinal fiyat
+  hasDiscount?: boolean; // Indirimli mi
   image: string;
   category: string;
   stock?: number; // Optional: for limited stock items
