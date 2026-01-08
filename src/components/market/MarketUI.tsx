@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useMarket } from '@/hooks/useMarket';
 import { useCart } from '@/hooks/useCart';
 import { useSalesData } from '@/hooks/useSalesData';
 import { cn } from '@/lib/utils';
-import { ShoppingCart, X, Coins, TrendingUp, ArrowRightLeft } from 'lucide-react';
+import { ShoppingCart, X, Percent } from 'lucide-react';
 import { MarketItem } from '@/types/market';
 
 import { BalanceDisplay } from './BalanceDisplay';
@@ -61,16 +61,43 @@ export const MarketUI = () => {
 
   const { salesData, itemNames, recordSale } = useSalesData();
 
-  // Filter items by search query
+  // Daily discount item - random item with 5% discount
+  const [dailyDiscountItemId, setDailyDiscountItemId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Select random daily discount item
+    if (config.items.length > 0) {
+      const randomIndex = Math.floor(Math.random() * config.items.length);
+      setDailyDiscountItemId(config.items[randomIndex].id);
+    }
+  }, [config.id]); // Reset when market changes
+
+  // Apply discount to items
+  const itemsWithDiscount = useMemo(() => {
+    return config.items.map(item => ({
+      ...item,
+      originalPrice: item.price,
+      price: item.id === dailyDiscountItemId ? Math.floor(item.price * 0.95) : item.price,
+      hasDiscount: item.id === dailyDiscountItemId,
+    }));
+  }, [config.items, dailyDiscountItemId]);
+
+  // Filter items by search query and category
   const displayItems = useMemo(() => {
-    if (!searchQuery.trim()) return filteredItems;
+    let items = itemsWithDiscount;
     
-    const query = searchQuery.toLowerCase();
-    return config.items.filter(item => 
-      item.name.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query)
-    );
-  }, [filteredItems, searchQuery, config.items]);
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      items = items.filter(item => 
+        item.name.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query)
+      );
+    } else {
+      items = items.filter(item => item.category === selectedCategory);
+    }
+    
+    return items;
+  }, [itemsWithDiscount, searchQuery, selectedCategory]);
 
   const handlePurchaseClick = () => {
     const cartData = getCartData();
@@ -156,51 +183,22 @@ export const MarketUI = () => {
               )}
             </div>
             
-            {/* Right: Balance, Points, Stats & Cart */}
-            <div className="flex items-center gap-3">
-              {/* Sales Chart Button */}
-              <button
-                onClick={() => setIsSalesChartOpen(true)}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg",
-                  "bg-accent/20 border border-accent/50 text-accent",
-                  "hover:bg-accent/30 transition-all duration-300",
-                  "hover:scale-105"
-                )}
-                title="Satış İstatistikleri"
-              >
-                <TrendingUp className="w-4 h-4" />
-              </button>
+            {/* Right: Balance & Cart */}
+            <div className="flex items-center gap-4">
+              {/* Daily Discount Badge */}
+              {dailyDiscountItemId && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-destructive/20 border border-destructive/40 text-destructive">
+                  <Percent className="w-4 h-4" />
+                  <span className="text-sm font-medium">Günün İndirimi: %5</span>
+                </div>
+              )}
 
-              {/* Transfer Button */}
-              <button
-                onClick={() => setIsTransferPanelOpen(true)}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg",
-                  "bg-secondary/20 border border-secondary/50 text-secondary",
-                  "hover:bg-secondary/30 transition-all duration-300",
-                  "hover:scale-105"
-                )}
-                title="Marketi Devret"
-              >
-                <ArrowRightLeft className="w-4 h-4" />
-              </button>
-
-              {/* Points Button */}
-              <button
-                onClick={() => setIsPointsPanelOpen(true)}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg",
-                  "bg-secondary/20 border border-secondary/50 text-secondary",
-                  "hover:bg-secondary/30 transition-all duration-300",
-                  "hover:neon-glow-purple hover:scale-105"
-                )}
-              >
-                <Coins className="w-4 h-4" />
-                <span className="font-medium">{balance.points.toLocaleString()}</span>
-              </button>
-              
-              <BalanceDisplay balance={balance} />
+              <BalanceDisplay 
+                balance={balance} 
+                onPointsClick={() => setIsPointsPanelOpen(true)}
+                onStatsClick={() => setIsSalesChartOpen(true)}
+                onTransferClick={() => setIsTransferPanelOpen(true)}
+              />
               
               {/* Cart Button */}
               <button
@@ -208,9 +206,7 @@ export const MarketUI = () => {
                 className={cn(
                   "relative flex items-center gap-2 px-4 py-2 rounded-lg",
                   "bg-primary/20 border border-primary/50 text-primary",
-                  "hover:bg-primary/30 transition-all duration-300",
-                  "hover:neon-glow hover:scale-105",
-                  totalItems > 0 && "pulse-glow"
+                  "hover:bg-primary/30 transition-all duration-300"
                 )}
               >
                 <ShoppingCart className="w-5 h-5" />
