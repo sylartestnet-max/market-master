@@ -39,8 +39,10 @@ export const ItemDetailModal = ({
       
       {/* Modal */}
       <div className={cn(
-        "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
-        "w-full max-w-lg p-6 rounded-2xl",
+        "fixed z-50 p-6 rounded-2xl",
+        "w-[90vw] max-w-lg",
+        "top-1/2 left-1/2",
+        "-translate-x-1/2 -translate-y-1/2",
         "glass-darker border-2 border-primary/30 animated-border",
         "transition-all duration-500",
         isOpen ? "scale-100 opacity-100" : "scale-75 opacity-0 pointer-events-none"

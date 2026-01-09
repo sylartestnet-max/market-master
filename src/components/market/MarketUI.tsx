@@ -178,7 +178,7 @@ export const MarketUI = () => {
               </h1>
               {marketOwner && (
                 <p className="text-xs text-muted-foreground">
-                  Sahip: <span className="text-secondary neon-text-purple">{marketOwner}</span>
+                  Sahip: <span className="text-primary neon-text">{marketOwner}</span>
                 </p>
               )}
             </div>
