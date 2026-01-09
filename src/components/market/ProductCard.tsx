@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { MarketItem } from '@/types/market';
 import { cn } from '@/lib/utils';
 import { Plus, ShoppingCart } from 'lucide-react';
@@ -11,26 +11,12 @@ interface ProductCardProps {
   animationDelay?: number;
 }
 
-// Get consistent color variant based on item id
-const getColorVariant = (id: string): 'cyan' | 'green' | 'purple' => {
-  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const variants: ('cyan' | 'green' | 'purple')[] = ['cyan', 'green', 'purple'];
-  return variants[hash % 3];
-};
-
 export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 0 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState<1 | 10>(1);
 
-  const colorVariant = useMemo(() => getColorVariant(item.id), [item.id]);
-
-  const handleAddToCart = () => {
-    onAddToCart(item, selectedQuantity);
-  };
-
-  const handleImageClick = () => {
-    onImageClick(item);
-  };
+  // Only discounted items get purple, all others get cyan
+  const colorVariant = item.hasDiscount ? 'purple' : 'cyan';
 
   const colorClasses = {
     cyan: {
@@ -39,13 +25,6 @@ export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 
       text: 'text-primary neon-text',
       price: 'bg-primary/20 text-primary border-primary/50',
       button: 'bg-primary/20 hover:bg-primary/40 text-primary border-primary/50',
-    },
-    green: {
-      card: 'card-gradient-green hover-glow-green',
-      border: 'border-accent/40 hover:border-accent',
-      text: 'text-accent neon-text-green',
-      price: 'bg-accent/20 text-accent border-accent/50',
-      button: 'bg-accent/20 hover:bg-accent/40 text-accent border-accent/50',
     },
     purple: {
       card: 'card-gradient-purple hover-glow-purple',
@@ -57,6 +36,14 @@ export const ProductCard = ({ item, onAddToCart, onImageClick, animationDelay = 
   };
 
   const colors = colorClasses[colorVariant];
+
+  const handleAddToCart = () => {
+    onAddToCart(item, selectedQuantity);
+  };
+
+  const handleImageClick = () => {
+    onImageClick(item);
+  };
 
   return (
     <div
