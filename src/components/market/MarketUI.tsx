@@ -157,13 +157,13 @@ export const MarketUI = () => {
   const isAffordable = canAfford(totalPrice, paymentMethod);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/50 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
       {/* Main Container with Animated Border */}
-      <div className="relative w-full max-w-7xl h-[85vh] rounded-2xl overflow-hidden animated-border">
+      <div className="relative w-full max-w-7xl h-[85vh] rounded-2xl overflow-hidden animated-border pulse-glow-cyan">
         {/* Inner Container */}
-        <div className="absolute inset-[4px] rounded-2xl glass-darker flex flex-col overflow-hidden">
+        <div className="absolute inset-[2px] rounded-2xl glass-darker flex flex-col overflow-hidden">
           {/* Header Bar */}
-          <header className="flex items-center justify-between p-4 border-b-2 border-border/50">
+          <header className="flex items-center justify-between p-4 border-b border-primary/20">
             {/* Left: Market Selector */}
             <MarketSelector
               currentMarket={config.id}
@@ -173,12 +173,12 @@ export const MarketUI = () => {
             
             {/* Center: Market Name & Owner */}
             <div className="flex flex-col items-center gap-1">
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-2xl font-bold">
                 <span className="text-primary neon-text">{config.name}</span>
               </h1>
               {marketOwner && (
                 <p className="text-xs text-muted-foreground">
-                  Sahip: <span className="text-secondary">{marketOwner}</span>
+                  Sahip: <span className="text-secondary neon-text-purple">{marketOwner}</span>
                 </p>
               )}
             </div>
@@ -206,7 +206,7 @@ export const MarketUI = () => {
           </header>
           
           {/* Search Bar - Below Header */}
-          <div className="px-4 py-3 border-b border-border/30">
+          <div className="px-4 py-3 border-b border-primary/10">
             <div className="max-w-md mx-auto">
               <SearchBar
                 value={searchQuery}
@@ -219,7 +219,7 @@ export const MarketUI = () => {
           {/* Main Content */}
           <div className="flex flex-1 overflow-hidden">
             {/* Category Sidebar */}
-            <div className="p-4 border-r-2 border-border/30">
+            <div className="p-4 border-r border-primary/20">
               <CategorySidebar
                 categories={config.categories}
                 selectedCategory={selectedCategory}
