@@ -182,12 +182,15 @@ export const MarketUI = () => {
             />
             
             {/* Center: Market Name & Owner */}
-            <div className="flex flex-col items-center gap-1">
-              <h1 className="text-2xl font-bold tracking-wider">
+            <div className="flex flex-col items-center gap-1 max-w-[200px] sm:max-w-[280px] md:max-w-[350px]">
+              <h1 
+                className="text-base sm:text-lg md:text-xl font-bold tracking-wider truncate w-full text-center"
+                title={config.name}
+              >
                 <span className="text-primary neon-text">{config.name}</span>
               </h1>
               {marketOwner && (
-                <p className="text-xs text-muted-foreground tracking-wide">
+                <p className="text-[10px] sm:text-xs text-muted-foreground tracking-wide truncate w-full text-center">
                   Sahip: <span className="text-primary neon-text">{marketOwner}</span>
                 </p>
               )}
