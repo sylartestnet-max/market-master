@@ -157,13 +157,23 @@ export const MarketUI = () => {
   const isAffordable = canAfford(totalPrice, paymentMethod);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
-      {/* Main Container with Animated Border */}
-      <div className="relative w-full max-w-7xl h-[85vh] rounded-2xl overflow-hidden animated-border pulse-glow-cyan">
+    <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/90 backdrop-blur-md">
+      {/* Tech Grid Background */}
+      <div className="absolute inset-0 tech-grid opacity-10 pointer-events-none" />
+
+      {/* Main Container with Holographic Frame */}
+      <div className="relative w-full max-w-7xl h-[85vh] overflow-hidden holo-frame animated-border pulse-glow-cyan">
+        {/* Scanning Line Effect */}
+        <div className="absolute inset-0 scan-line pointer-events-none" />
+        
         {/* Inner Container */}
-        <div className="absolute inset-[2px] rounded-2xl glass-darker flex flex-col overflow-hidden">
+        <div className="absolute inset-[2px] glass-darker flex flex-col overflow-hidden"
+          style={{
+            clipPath: 'polygon(0 15px, 15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px))',
+          }}
+        >
           {/* Header Bar */}
-          <header className="flex items-center justify-between p-4 border-b border-primary/20">
+          <header className="relative flex items-center justify-between p-4 border-b border-primary/20 data-stream">
             {/* Left: Market Selector */}
             <MarketSelector
               currentMarket={config.id}
@@ -173,11 +183,11 @@ export const MarketUI = () => {
             
             {/* Center: Market Name & Owner */}
             <div className="flex flex-col items-center gap-1">
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-2xl font-bold tracking-wider">
                 <span className="text-primary neon-text">{config.name}</span>
               </h1>
               {marketOwner && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground tracking-wide">
                   Sahip: <span className="text-primary neon-text">{marketOwner}</span>
                 </p>
               )}
@@ -197,8 +207,11 @@ export const MarketUI = () => {
               {/* Close Button (for FiveM) */}
               <button
                 onClick={closeMarket}
-                className="p-2 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                className="p-2 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-all duration-300 glitch-hover"
                 title="Marketi Kapat"
+                style={{
+                  clipPath: 'polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%)',
+                }}
               >
                 <X className="w-6 h-6" />
               </button>
@@ -206,7 +219,7 @@ export const MarketUI = () => {
           </header>
           
           {/* Search Bar - Below Header */}
-          <div className="px-4 py-3 border-b border-primary/10">
+          <div className="relative px-4 py-3 border-b border-primary/10">
             <div className="max-w-md mx-auto">
               <SearchBar
                 value={searchQuery}
@@ -214,6 +227,8 @@ export const MarketUI = () => {
                 placeholder="Ürün ara... (isim veya açıklama)"
               />
             </div>
+            {/* Decorative lines */}
+            <div className="absolute left-0 right-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           </div>
           
           {/* Main Content */}
@@ -232,11 +247,13 @@ export const MarketUI = () => {
             
             {/* Product Grid */}
             <ScrollArea className="flex-1">
-              <ProductGrid
-                items={displayItems}
-                onAddToCart={addItem}
-                onImageClick={handleImageClick}
-              />
+              <div className="relative">
+                <ProductGrid
+                  items={displayItems}
+                  onAddToCart={addItem}
+                  onImageClick={handleImageClick}
+                />
+              </div>
             </ScrollArea>
           </div>
         </div>
