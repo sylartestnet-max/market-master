@@ -1,39 +1,45 @@
 Config = {}
 
 -- ═══════════════════════════════════════════════════════════════════
--- FRAMEWORK SETTINGS
+-- FRAMEWORK AYARLARI
 -- ═══════════════════════════════════════════════════════════════════
-Config.Framework = 'qb' -- 'qb', 'esx', 'standalone'
-Config.Inventory = 'ox' -- 'ox', 'qb', 'qs', 'custom'
-Config.Target = 'ox' -- 'ox', 'qb', 'none'
+-- Config.Framework = 'qb' | 'esx' | 'standalone'
+Config.Framework = 'qb'
+
+-- Envanter sistemi: 'ox' | 'qb' | 'qs' | 'custom'
+Config.Inventory = 'ox'
+
+-- Target sistemi: 'ox' | 'qb' | 'none'
+Config.Target = 'ox'
 
 -- ═══════════════════════════════════════════════════════════════════
--- NOTIFICATION SYSTEM
+-- BİLDİRİM SİSTEMİ
 -- ═══════════════════════════════════════════════════════════════════
-Config.Notification = 'ox' -- 'ox', 'qb', 'esx', 'custom'
+-- 'ox' | 'qb' | 'esx' | 'custom'
+Config.Notification = 'ox'
 
 -- ═══════════════════════════════════════════════════════════════════
--- SECURITY SETTINGS
+-- GÜVENLİK AYARLARI
 -- ═══════════════════════════════════════════════════════════════════
 Config.Security = {
-    EventSpamDelay = 500, -- ms between events
-    MaxPurchaseQuantity = 100, -- Max items per purchase
-    DistanceCheck = 5.0, -- Max distance from shop
-    LogPurchases = true, -- Log all purchases
+    EventSpamDelay = 500, -- ms (işlemler arası minimum süre)
+    MaxPurchaseQuantity = 100, -- Tek alışverişte maksimum adet
+    DistanceCheck = 5.0, -- Marketten maksimum uzaklık
+    LogPurchases = true, -- Tüm satın almaları logla
 }
 
 -- ═══════════════════════════════════════════════════════════════════
--- POINT SYSTEM
+-- PUAN SİSTEMİ
 -- ═══════════════════════════════════════════════════════════════════
 Config.Points = {
     Enabled = true,
-    PointsPerDollar = 1, -- Points earned per $1 spent
-    OwnerBonusPercent = 5, -- Owner gets 5% bonus points on sales
-    Multiplier = 1.0, -- Global multiplier
+    PointsPerDollar = 1, -- Harcanan $1 başına puan
+    OwnerBonusPercent = 5, -- Market sahibi satışlardan % bonus puan
+    Multiplier = 1.0, -- Global çarpan
 }
 
 -- ═══════════════════════════════════════════════════════════════════
--- MARKET LOCATIONS
+-- MARKET NOKTALARI
 -- ═══════════════════════════════════════════════════════════════════
 Config.Markets = {
     ['market_1'] = {
@@ -50,13 +56,13 @@ Config.Markets = {
             model = 'mp_m_shopkeep_01',
             heading = 270.0,
         },
-        ownable = true, -- Can be purchased by players
-        ownerId = nil, -- Player citizen ID (nil = unowned)
+        ownable = true, -- Oyuncular satın alabilir mi?
+        ownerId = nil, -- citizenid / identifier (nil = sahipsiz)
         ownerName = nil,
-        price = 500000, -- Purchase price
+        price = 500000, -- Satın alma fiyatı
         categories = {'food', 'drinks', 'medical', 'tools'},
     },
-    
+
     ['market_2'] = {
         name = 'Sandy Shores Market',
         coords = vector3(1960.0, 3740.0, 32.3),
@@ -77,7 +83,7 @@ Config.Markets = {
         price = 350000,
         categories = {'food', 'drinks', 'survival'},
     },
-    
+
     ['market_3'] = {
         name = 'Paleto Market',
         coords = vector3(-161.0, 6321.0, 31.6),
@@ -101,7 +107,7 @@ Config.Markets = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════
--- ITEM CATEGORIES
+-- KATEGORİLER
 -- ═══════════════════════════════════════════════════════════════════
 Config.Categories = {
     ['food'] = {
@@ -137,10 +143,10 @@ Config.Categories = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════
--- ITEMS DATABASE
+-- ÜRÜNLER
 -- ═══════════════════════════════════════════════════════════════════
 Config.Items = {
-    -- FOOD
+    -- YİYECEK
     ['bread'] = {
         name = 'Ekmek',
         category = 'food',
@@ -177,8 +183,8 @@ Config.Items = {
         description = 'Tatlı donut',
         maxStock = 40,
     },
-    
-    -- DRINKS
+
+    -- İÇECEK
     ['water'] = {
         name = 'Su',
         category = 'drinks',
@@ -215,8 +221,8 @@ Config.Items = {
         description = 'Enerji ver',
         maxStock = 30,
     },
-    
-    -- MEDICAL
+
+    -- MEDİKAL
     ['bandage'] = {
         name = 'Bandaj',
         category = 'medical',
@@ -244,8 +250,8 @@ Config.Items = {
         description = 'Tam ilk yardım seti',
         maxStock = 20,
     },
-    
-    -- TOOLS
+
+    -- ARAÇLAR
     ['flashlight'] = {
         name = 'El Feneri',
         category = 'tools',
@@ -273,8 +279,8 @@ Config.Items = {
         description = 'Kilit açma aracı',
         maxStock = 10,
     },
-    
-    -- SURVIVAL
+
+    -- HAYATTA KALMA
     ['tent'] = {
         name = 'Çadır',
         category = 'survival',
@@ -302,8 +308,8 @@ Config.Items = {
         description = 'Güçlü halat',
         maxStock = 20,
     },
-    
-    -- FISHING
+
+    -- BALIKÇILIK
     ['fishingrod'] = {
         name = 'Olta',
         category = 'fishing',
@@ -334,7 +340,7 @@ Config.Items = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════
--- LOCALE / LANGUAGE
+-- DİL / MESAJLAR
 -- ═══════════════════════════════════════════════════════════════════
 Config.Locale = {
     ['market_open'] = 'Markete hoş geldiniz!',
@@ -349,3 +355,4 @@ Config.Locale = {
     ['spam_warning'] = 'Çok hızlı işlem yapıyorsunuz!',
     ['points_earned'] = 'Puan kazandınız: ',
 }
+

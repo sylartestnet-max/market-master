@@ -29,6 +29,7 @@ export const MarketUI = () => {
   const [isTransferPanelOpen, setIsTransferPanelOpen] = useState(false);
   
   const {
+    isOpen,
     config,
     balance,
     setBalance,
@@ -45,7 +46,7 @@ export const MarketUI = () => {
     transferMarket,
     marketOwner,
   } = useMarket();
-  
+
   const {
     items: cartItems,
     paymentMethod,
