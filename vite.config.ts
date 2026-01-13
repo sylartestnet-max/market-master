@@ -5,9 +5,19 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "./", // FiveM NUI için relative asset path
   server: {
     host: "::",
     port: 8080,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: "assets/index.js",
+        chunkFileNames: "assets/chunk-[hash].js",
+        assetFileNames: "assets/[name][extname]",
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
@@ -16,3 +26,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+
