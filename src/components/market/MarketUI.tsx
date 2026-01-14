@@ -47,6 +47,22 @@ export const MarketUI = () => {
     marketOwner,
   } = useMarket();
 
+  // ESC tuşu ile kapatma
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeMarket();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeMarket]);
+
+  // Market kapalıysa hiçbir şey render etme
+  if (!isOpen) {
+    return null;
+  }
+
   const {
     items: cartItems,
     paymentMethod,
