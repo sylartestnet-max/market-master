@@ -11,11 +11,13 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
+    outDir: "fivem-market/html/assets/ui",
+    emptyOutDir: true,
     rollupOptions: {
       output: {
-        entryFileNames: "assets/index.js",
-        chunkFileNames: "assets/chunk-[hash].js",
-        assetFileNames: "assets/[name][extname]",
+        entryFileNames: "index.js",
+        chunkFileNames: "chunk-[hash].js",
+        assetFileNames: "[name][extname]",
       },
     },
   },
