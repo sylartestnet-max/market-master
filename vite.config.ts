@@ -5,21 +5,17 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "./", // FiveM NUI için relative asset path
+  base: "./",
   server: {
     host: "::",
     port: 8080,
   },
   build: {
-    // Build çıktısını direkt FiveM resource içine alıyoruz (tek klasörle taşıma için)
-    // Not: UI bundle'ı ayrı bir klasörde tutuyoruz ki item görselleri silinmesin.
-    outDir: "fivem-market/html/assets/ui",
-    emptyOutDir: true,
     rollupOptions: {
       output: {
-        entryFileNames: "index.js",
-        chunkFileNames: "chunk-[hash].js",
-        assetFileNames: "[name][extname]",
+        entryFileNames: "assets/index.js",
+        chunkFileNames: "assets/chunk-[hash].js",
+        assetFileNames: "assets/[name][extname]",
       },
     },
   },
