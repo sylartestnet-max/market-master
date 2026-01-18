@@ -51,11 +51,13 @@ fivem-market/
 ### 3. React UI Build
 ```bash
 # Ana proje dizininde
+npm install
 npm run build
 
-# Build dosyalarını kopyalayın
-cp -r dist/* fivem-market/html/
+# ✅ Artık kopyalama gerekmiyor:
+# Build çıktısı otomatik olarak fivem-market/html/assets/ui/ içine yazılır.
 ```
+
 
 ### 4. Config Ayarları
 `config.lua` dosyasını düzenleyin:
