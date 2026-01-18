@@ -10,38 +10,27 @@ Ana proje dizininde terminal açın ve:
 npm run build
 ```
 
-Bu komut `dist/` klasörü oluşturacak.
+Bu komut UI build dosyalarını **direkt** `fivem-market/html/assets/ui/` içine yazacak.
 
-## Adım 2: Build Dosyalarını Kopyalayın
+## Adım 2: Kopyalama Yok (Otomatik)
 
-```bash
-# dist klasörünün içeriğini html klasörüne kopyalayın
-cp -r dist/* fivem-market/html/
+Artık `dist/` oluşmasını beklemeyin; ayrıca `cp -r dist/* ...` yapmanıza gerek yok.
+
+Build sonrası şu dosyaların geldiğini kontrol edin:
+
+```
+fivem-market/html/assets/ui/
+├── index.js
+├── index.css
+└── chunk-*.js (varsa)
 ```
 
-## Adım 3: index.html Düzenlemesi
+## Adım 3: index.html
 
-`fivem-market/html/index.html` dosyasını açın ve build edilen dosya isimlerini güncelleyin:
+`fivem-market/html/index.html` zaten aşağıdaki dosyaları yükleyecek şekilde ayarlı:
 
-```html
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market NUI</title>
-    <!-- Build edilen CSS dosyası -->
-    <link rel="stylesheet" href="./assets/index-XXXXX.css">
-</head>
-<body>
-    <div id="root"></div>
-    <!-- Build edilen JS dosyası -->
-    <script type="module" src="./assets/index-XXXXX.js"></script>
-</body>
-</html>
-```
-
-`XXXXX` kısmını gerçek hash değerleriyle değiştirin (dist/assets/ içindeki dosya isimlerine bakın).
+- `./assets/ui/index.css`
+- `./assets/ui/index.js`
 
 ## Adım 4: NUI Bridge Entegrasyonu
 

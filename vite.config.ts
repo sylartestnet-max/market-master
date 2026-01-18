@@ -11,11 +11,15 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
+    // Build çıktısını direkt FiveM resource içine alıyoruz (tek klasörle taşıma için)
+    // Not: UI bundle'ı ayrı bir klasörde tutuyoruz ki item görselleri silinmesin.
+    outDir: "fivem-market/html/assets/ui",
+    emptyOutDir: true,
     rollupOptions: {
       output: {
-        entryFileNames: "assets/index.js",
-        chunkFileNames: "assets/chunk-[hash].js",
-        assetFileNames: "assets/[name][extname]",
+        entryFileNames: "index.js",
+        chunkFileNames: "chunk-[hash].js",
+        assetFileNames: "[name][extname]",
       },
     },
   },
