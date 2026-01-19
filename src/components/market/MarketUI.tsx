@@ -20,6 +20,7 @@ import { MarketTransferPanel } from './MarketTransferPanel';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const MarketUI = () => {
+  // ===== TÜM HOOK'LAR EN ÜSTTE OLMALI (React Rules of Hooks) =====
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isPointsPanelOpen, setIsPointsPanelOpen] = useState(false);
@@ -27,6 +28,7 @@ export const MarketUI = () => {
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [isSalesChartOpen, setIsSalesChartOpen] = useState(false);
   const [isTransferPanelOpen, setIsTransferPanelOpen] = useState(false);
+  const [dailyDiscountItemId, setDailyDiscountItemId] = useState<string | null>(null);
   
   const {
     isOpen,
@@ -47,22 +49,6 @@ export const MarketUI = () => {
     marketOwner,
   } = useMarket();
 
-  // ESC tuşu ile kapatma
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeMarket();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [closeMarket]);
-
-  // Market kapalıysa hiçbir şey render etme
-  if (!isOpen) {
-    return null;
-  }
-
   const {
     items: cartItems,
     paymentMethod,
@@ -78,17 +64,29 @@ export const MarketUI = () => {
 
   const { salesData, itemNames, recordSale } = useSalesData();
 
-  // Daily discount item - random item with 5% discount
-  const [dailyDiscountItemId, setDailyDiscountItemId] = useState<string | null>(null);
-  
+  // ESC tuşu ile kapatma
   useEffect(() => {
-    // Select random daily discount item
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeMarket();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeMarket]);
+
+  // Daily discount item - random item with 5% discount
+  useEffect(() => {
     if (config.items.length > 0) {
       const randomIndex = Math.floor(Math.random() * config.items.length);
       setDailyDiscountItemId(config.items[randomIndex].id);
     }
-  }, [config.id]); // Reset when market changes
+  }, [config.id]);
 
+  // Market kapalıysa hiçbir şey render etme (hook'lardan SONRA!)
+  if (!isOpen) {
+    return null;
+  }
   // Apply discount to items
   const itemsWithDiscount = useMemo(() => {
     return config.items.map(item => ({
