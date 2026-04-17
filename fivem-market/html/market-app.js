@@ -81,6 +81,29 @@
         return '$' + amount.toLocaleString();
     }
 
+    // Detect whether a string is an image path (.png/.jpg/.svg/.webp/.gif or http/nui)
+    function isImagePath(str) {
+        if (!str || typeof str !== 'string') return false;
+        const s = str.trim().toLowerCase();
+        if (s.startsWith('http://') || s.startsWith('https://') || s.startsWith('nui://') || s.startsWith('./') || s.startsWith('/') || s.startsWith('assets/')) return true;
+        return /\.(png|jpe?g|svg|webp|gif)$/i.test(s);
+    }
+
+    // Render image cell: emoji as text, paths as <img>, fallback emoji on error
+    function renderImage(image, fallback) {
+        const fb = fallback || '📦';
+        if (!image) return `<span class="emoji-icon">${fb}</span>`;
+        if (isImagePath(image)) {
+            // If it's just a filename (e.g. bread.png), assume it's in assets/ui/
+            let src = image;
+            if (!/^(https?:|nui:|\.\/|\/|assets\/)/i.test(src)) {
+                src = './assets/ui/' + src;
+            }
+            return `<img src="${src}" alt="" class="img-icon" onerror="this.outerHTML='<span class=&quot;emoji-icon&quot;>${fb}</span>'">`;
+        }
+        return `<span class="emoji-icon">${image}</span>`;
+    }
+
     function showNotification(message, type = 'success') {
         elements.notification.className = 'notification ' + type;
         elements.notificationIcon.textContent = type === 'success' ? '✓' : '✕';
@@ -93,7 +116,7 @@
     }
 
     function getResourceName() {
-        return window.GetParentResourceName ? window.GetParentResourceName() : 'market';
+        return window.GetParentResourceName ? window.GetParentResourceName() : 'fivem-market';
     }
 
     function fetchNUI(eventName, data = {}) {
@@ -103,6 +126,7 @@
             body: JSON.stringify(data)
         }).then(res => res.json()).catch(() => ({}));
     }
+
 
     // ============================================
     // RENDER FUNCTIONS
