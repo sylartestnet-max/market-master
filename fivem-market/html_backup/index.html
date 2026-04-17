@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Market UI Container -->
+    <div id="market-app" class="hidden">
+        <!-- Tech Grid Background -->
+        <div class="tech-grid-bg"></div>
+        
+        <!-- Main Container with Holographic Frame -->
+        <div class="market-container holo-frame">
+            <!-- Scanning Line Effect -->
+            <div class="scan-line"></div>
+            
+            <!-- Inner Container -->
+            <div class="market-inner">
+                <!-- Header Bar -->
+                <header class="market-header">
+                    <!-- Left: Market Selector -->
+                    <div class="market-selector">
+                        <button id="market-selector-btn" class="selector-btn">
+                            <span class="selector-icon">🏪</span>
+                            <span id="current-market-name">Market</span>
+                            <span class="selector-arrow">▼</span>
+                        </button>
+                        <div id="market-dropdown" class="selector-dropdown hidden">
+                            <!-- Markets will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Center: Market Name & Owner -->
+                    <div class="market-title">
+                        <h1 id="market-name" class="neon-text">Market</h1>
+                        <p id="market-owner" class="owner-text hidden">Sahip: <span></span></p>
+                    </div>
+                    
+                    <!-- Right: Balance & Controls -->
+                    <div class="header-controls">
+                        <div class="balance-display">
+                            <div class="balance-item">
+                                <span class="balance-icon">💵</span>
+                                <span id="balance-cash">$0</span>
+                            </div>
+                            <div class="balance-item">
+                                <span class="balance-icon">🏦</span>
+                                <span id="balance-bank">$0</span>
+                            </div>
+                            <button id="points-btn" class="balance-item points-btn" title="Puanlar">
+                                <span class="balance-icon">⭐</span>
+                                <span id="balance-points">0</span>
+                            </button>
+                        </div>
+                        
+                        <button id="cart-btn" class="cart-button" title="Sepet">
+                            <span class="cart-icon">🛒</span>
+                            <span id="cart-count" class="cart-count hidden">0</span>
+                        </button>
+                        
+                        <button id="close-btn" class="close-button" title="Kapat">✕</button>
+                    </div>
+                </header>
+                
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Ürün ara... (isim veya açıklama)" autocomplete="off">
+                        <button id="search-clear" class="search-clear hidden">✕</button>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="main-content">
+                    <!-- Category Sidebar -->
+                    <aside class="category-sidebar">
+                        <div id="categories-list" class="categories-list">
+                            <!-- Categories will be populated here -->
+                        </div>
+                    </aside>
+                    
+                    <!-- Product Grid -->
+                    <main class="products-area">
+                        <div id="products-grid" class="products-grid">
+                            <!-- Products will be populated here -->
+                        </div>
+                        <div id="no-products" class="no-products hidden">
+                            <span class="no-products-icon">📦</span>
+                            <p>Ürün bulunamadı</p>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cart Drawer -->
+    <div id="cart-drawer" class="drawer hidden">
+        <div class="drawer-overlay"></div>
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h2>🛒 Sepetim</h2>
+                <button id="cart-close" class="drawer-close">✕</button>
+            </div>
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items will be populated here -->
+            </div>
+            <div id="cart-empty" class="cart-empty">
+                <span class="cart-empty-icon">🛒</span>
+                <p>Sepetiniz boş</p>
+            </div>
+            <div class="cart-footer">
+                <div class="payment-selector">
+                    <label>Ödeme Yöntemi:</label>
+                    <div class="payment-options">
+                        <button id="pay-cash" class="payment-btn active" data-method="cash">💵 Nakit</button>
+                        <button id="pay-bank" class="payment-btn" data-method="bank">🏦 Banka</button>
+                    </div>
+                </div>
+                <div class="cart-total">
+                    <span>Toplam:</span>
+                    <span id="cart-total-price" class="total-price">$0</span>
+                </div>
+                <button id="purchase-btn" class="purchase-btn" disabled>Satın Al</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Points Panel -->
+    <div id="points-panel" class="drawer hidden">
+        <div class="drawer-overlay"></div>
+        <div class="drawer-content points-content">
+            <div class="drawer-header">
+                <h2>⭐ Puanlarım</h2>
+                <button id="points-close" class="drawer-close">✕</button>
+            </div>
+            <div class="points-body">
+                <div class="points-display">
+                    <span class="points-value" id="points-value">0</span>
+                    <span class="points-label">Puan</span>
+                </div>
+                <div class="points-withdraw">
+                    <label>Bankaya Aktar:</label>
+                    <input type="number" id="withdraw-amount" min="0" placeholder="Miktar">
+                    <p class="points-min-info">Minimum: <span id="min-withdraw">500</span> puan</p>
+                    <button id="withdraw-btn" class="withdraw-btn" disabled>Aktar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Item Detail Modal -->
+    <div id="item-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button id="modal-close" class="modal-close">✕</button>
+            <div class="modal-body">
+                <div class="modal-image" id="modal-image">🍔</div>
+                <div class="modal-info">
+                    <h2 id="modal-name">Ürün Adı</h2>
+                    <p id="modal-description" class="modal-desc">Açıklama</p>
+                    <p id="modal-detailed" class="modal-detailed"></p>
+                    <p id="modal-usage" class="modal-usage"></p>
+                    <div class="modal-price">
+                        <span id="modal-price">$0</span>
+                        <span id="modal-original-price" class="original-price hidden">$0</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="modal-add-cart" class="add-cart-btn">Sepete Ekle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Toast -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-icon" class="notification-icon">✓</span>
+        <span id="notification-message">Bildirim</span>
+    </div>
+    
+    <script src="./market-app.js"></script>
+</body>
+</html>
