@@ -280,7 +280,7 @@
                 : item.price;
             return `
                 <div class="cart-item" data-item-id="${item.id}">
-                    <div class="cart-item-image">${item.image}</div>
+                    <div class="cart-item-image">${renderImage(item.image, '📦')}</div>
                     <div class="cart-item-info">
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-price">${formatMoney(price)} × ${cartItem.quantity}</div>
@@ -368,7 +368,7 @@
         const hasDiscount = item.id === state.dailyDiscountItemId;
         const price = hasDiscount ? Math.floor(item.price * 0.95) : item.price;
 
-        elements.modalImage.textContent = item.image;
+        elements.modalImage.innerHTML = renderImage(item.image, '📦');
         elements.modalName.textContent = item.name;
         elements.modalDescription.textContent = item.description;
         elements.modalDetailed.textContent = item.detailedDescription || '';
