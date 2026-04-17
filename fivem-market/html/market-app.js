@@ -81,6 +81,29 @@
         return '$' + amount.toLocaleString();
     }
 
+    // Detect whether a string is an image path (.png/.jpg/.svg/.webp/.gif or http/nui)
+    function isImagePath(str) {
+        if (!str || typeof str !== 'string') return false;
+        const s = str.trim().toLowerCase();
+        if (s.startsWith('http://') || s.startsWith('https://') || s.startsWith('nui://') || s.startsWith('./') || s.startsWith('/') || s.startsWith('assets/')) return true;
+        return /\.(png|jpe?g|svg|webp|gif)$/i.test(s);
+    }
+
+    // Render image cell: emoji as text, paths as <img>, fallback emoji on error
+    function renderImage(image, fallback) {
+        const fb = fallback || '📦';
+        if (!image) return `<span class="emoji-icon">${fb}</span>`;
+        if (isImagePath(image)) {
+            // If it's just a filename (e.g. bread.png), assume it's in assets/ui/
+            let src = image;
+            if (!/^(https?:|nui:|\.\/|\/|assets\/)/i.test(src)) {
+                src = './assets/ui/' + src;
+            }
+            return `<img src="${src}" alt="" class="img-icon" onerror="this.outerHTML='<span class=&quot;emoji-icon&quot;>${fb}</span>'">`;
+        }
+        return `<span class="emoji-icon">${image}</span>`;
+    }
+
     function showNotification(message, type = 'success') {
         elements.notification.className = 'notification ' + type;
         elements.notificationIcon.textContent = type === 'success' ? '✓' : '✕';
@@ -93,7 +116,7 @@
     }
 
     function getResourceName() {
-        return window.GetParentResourceName ? window.GetParentResourceName() : 'market';
+        return window.GetParentResourceName ? window.GetParentResourceName() : 'fivem-market';
     }
 
     function fetchNUI(eventName, data = {}) {
@@ -103,6 +126,7 @@
             body: JSON.stringify(data)
         }).then(res => res.json()).catch(() => ({}));
     }
+
 
     // ============================================
     // RENDER FUNCTIONS
@@ -121,12 +145,11 @@
         elements.categoriesList.innerHTML = state.config.categories.map(cat => `
             <button class="category-btn ${cat.id === state.selectedCategory ? 'active' : ''}" 
                     data-category="${cat.id}">
-                <span class="category-icon">${cat.icon}</span>
-                <span>${cat.name}</span>
+                <span class="category-icon">${renderImage(cat.icon, '📁')}</span>
+                <span class="category-name">${cat.name}</span>
             </button>
         `).join('');
 
-        // Add event listeners
         elements.categoriesList.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 state.selectedCategory = btn.dataset.category;
@@ -149,7 +172,6 @@
             hasDiscount: item.id === state.dailyDiscountItemId
         }));
 
-        // Filter by search or category
         if (state.searchQuery.trim()) {
             const query = state.searchQuery.toLowerCase();
             items = items.filter(item =>
@@ -171,11 +193,19 @@
 
         elements.productsGrid.innerHTML = items.map(item => `
             <div class="product-card ${item.hasDiscount ? 'has-discount' : ''}" data-item-id="${item.id}">
-                <div class="product-image">${item.image}</div>
+                <span class="corner corner-tl"></span>
+                <span class="corner corner-tr"></span>
+                <span class="corner corner-bl"></span>
+                <span class="corner corner-br"></span>
+                ${item.hasDiscount ? '<div class="discount-badge">✨ %5 İNDİRİM</div>' : ''}
+                <div class="product-image-wrap">
+                    <div class="product-halo"></div>
+                    <div class="product-image">${renderImage(item.image, '📦')}</div>
+                </div>
                 <div class="product-name">${item.name}</div>
                 <div class="product-desc">${item.description}</div>
                 <div class="product-footer">
-                    <div>
+                    <div class="product-price-wrap">
                         <span class="product-price ${item.hasDiscount ? 'discounted' : ''}">${formatMoney(item.price)}</span>
                         ${item.hasDiscount ? `<span class="product-original-price">${formatMoney(item.originalPrice)}</span>` : ''}
                     </div>
@@ -184,10 +214,9 @@
             </div>
         `).join('');
 
-        // Add event listeners
         elements.productsGrid.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                if (e.target.classList.contains('add-to-cart-btn')) return;
+                if (e.target.closest('.add-to-cart-btn')) return;
                 openItemModal(card.dataset.itemId);
             });
         });
@@ -199,6 +228,7 @@
             });
         });
     }
+
 
     function renderCart() {
         const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -250,7 +280,7 @@
                 : item.price;
             return `
                 <div class="cart-item" data-item-id="${item.id}">
-                    <div class="cart-item-image">${item.image}</div>
+                    <div class="cart-item-image">${renderImage(item.image, '📦')}</div>
                     <div class="cart-item-info">
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-price">${formatMoney(price)} × ${cartItem.quantity}</div>
@@ -338,7 +368,7 @@
         const hasDiscount = item.id === state.dailyDiscountItemId;
         const price = hasDiscount ? Math.floor(item.price * 0.95) : item.price;
 
-        elements.modalImage.textContent = item.image;
+        elements.modalImage.innerHTML = renderImage(item.image, '📦');
         elements.modalName.textContent = item.name;
         elements.modalDescription.textContent = item.description;
         elements.modalDetailed.textContent = item.detailedDescription || '';
