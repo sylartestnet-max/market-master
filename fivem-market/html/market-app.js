@@ -145,12 +145,11 @@
         elements.categoriesList.innerHTML = state.config.categories.map(cat => `
             <button class="category-btn ${cat.id === state.selectedCategory ? 'active' : ''}" 
                     data-category="${cat.id}">
-                <span class="category-icon">${cat.icon}</span>
-                <span>${cat.name}</span>
+                <span class="category-icon">${renderImage(cat.icon, '📁')}</span>
+                <span class="category-name">${cat.name}</span>
             </button>
         `).join('');
 
-        // Add event listeners
         elements.categoriesList.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 state.selectedCategory = btn.dataset.category;
@@ -173,7 +172,6 @@
             hasDiscount: item.id === state.dailyDiscountItemId
         }));
 
-        // Filter by search or category
         if (state.searchQuery.trim()) {
             const query = state.searchQuery.toLowerCase();
             items = items.filter(item =>
@@ -195,11 +193,19 @@
 
         elements.productsGrid.innerHTML = items.map(item => `
             <div class="product-card ${item.hasDiscount ? 'has-discount' : ''}" data-item-id="${item.id}">
-                <div class="product-image">${item.image}</div>
+                <span class="corner corner-tl"></span>
+                <span class="corner corner-tr"></span>
+                <span class="corner corner-bl"></span>
+                <span class="corner corner-br"></span>
+                ${item.hasDiscount ? '<div class="discount-badge">✨ %5 İNDİRİM</div>' : ''}
+                <div class="product-image-wrap">
+                    <div class="product-halo"></div>
+                    <div class="product-image">${renderImage(item.image, '📦')}</div>
+                </div>
                 <div class="product-name">${item.name}</div>
                 <div class="product-desc">${item.description}</div>
                 <div class="product-footer">
-                    <div>
+                    <div class="product-price-wrap">
                         <span class="product-price ${item.hasDiscount ? 'discounted' : ''}">${formatMoney(item.price)}</span>
                         ${item.hasDiscount ? `<span class="product-original-price">${formatMoney(item.originalPrice)}</span>` : ''}
                     </div>
@@ -208,10 +214,9 @@
             </div>
         `).join('');
 
-        // Add event listeners
         elements.productsGrid.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                if (e.target.classList.contains('add-to-cart-btn')) return;
+                if (e.target.closest('.add-to-cart-btn')) return;
                 openItemModal(card.dataset.itemId);
             });
         });
@@ -223,6 +228,7 @@
             });
         });
     }
+
 
     function renderCart() {
         const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
