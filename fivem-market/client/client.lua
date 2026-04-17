@@ -199,20 +199,25 @@ local function OpenMarket(marketId)
         balance.points = PlayerData.metadata['marketpoints'] or 0
     end
     
-    -- Send data to NUI
+    -- Send data to NUI (market-app.js expects data.config and data.balance structure)
     SendNUIMessage({
         action = 'openMarket',
-        data = {
-            marketId = marketId,
+        config = {
+            id = marketId,
             name = market.name,
             ownerId = market.ownerId,
             ownerName = market.ownerName,
             ownable = market.ownable,
             items = items,
             categories = categories,
-            balance = balance,
-            pointsConfig = Config.Points,
-        }
+        },
+        balance = {
+            cash = balance.cash,
+            bank = balance.bank,
+            points = balance.points,
+            minPointWithdraw = (Config.Points and Config.Points.minWithdraw) or 500,
+        },
+        pointsConfig = Config.Points,
     })
     
     SetNuiFocus(true, true)

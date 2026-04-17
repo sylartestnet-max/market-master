@@ -625,40 +625,21 @@
     // ============================================
     window.addEventListener('message', (event) => {
         const data = event.data;
-        if (!data || !data.action) return;
 
         switch (data.action) {
             case 'openMarket':
-                // Support both {config, balance} (new) and {data: {...}} (old) shapes
-                if (data.config) {
-                    openMarket({ config: data.config, balance: data.balance });
-                } else if (data.data) {
-                    const d = data.data;
-                    openMarket({
-                        config: {
-                            id: d.marketId,
-                            name: d.name,
-                            ownerId: d.ownerId,
-                            ownerName: d.ownerName,
-                            ownable: d.ownable,
-                            items: d.items || [],
-                            categories: d.categories || []
-                        },
-                        balance: d.balance || { cash: 0, bank: 0, points: 0, minPointWithdraw: 500 }
-                    });
-                }
+                openMarket(data);
                 break;
             case 'closeMarket':
                 closeMarket();
                 break;
             case 'updateBalance':
-                state.balance = { ...state.balance, ...(data.data || data.balance || {}) };
+                state.balance = { ...state.balance, ...data.balance };
                 renderBalance();
                 renderCart();
                 break;
             case 'updateOwner':
-                const ownerData = data.data || data;
-                state.marketOwner = ownerData.ownerName;
+                state.marketOwner = data.ownerName;
                 if (state.marketOwner) {
                     elements.marketOwner.querySelector('span').textContent = state.marketOwner;
                     elements.marketOwner.classList.remove('hidden');
