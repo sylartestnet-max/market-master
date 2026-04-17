@@ -472,7 +472,7 @@ html, body {
   box-shadow: 0 0 10px hsla(175, 80%, 50%, 0.2);
 }
 
-.category-icon { font-size: 18px; }
+.category-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; }
 
 /* Products Area */
 .products-area {
