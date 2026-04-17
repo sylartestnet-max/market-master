@@ -3,12 +3,11 @@ game 'gta5'
 
 author 'Lovable Market Script'
 description 'Advanced Market System with QB/ESX/OX Support'
-version '1.0.0'
+version '1.0.1'
 
 lua54 'yes'
 
 shared_scripts {
-    '@ox_lib/init.lua', -- Optional: ox_lib support
     'config.lua'
 }
 
@@ -17,7 +16,7 @@ client_scripts {
 }
 
 server_scripts {
-    '@oxmysql/lib/MySQL.lua', -- MySQL support
+    '@oxmysql/lib/MySQL.lua',
     'server/server.lua'
 }
 
@@ -31,5 +30,7 @@ files {
 }
 
 dependencies {
-    'oxmysql'
+    'oxmysql',
+    'qb-core',
+    'qb-target'
 }

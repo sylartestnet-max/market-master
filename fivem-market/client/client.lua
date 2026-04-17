@@ -274,14 +274,15 @@ CreateThread(function()
                 exports['qb-target']:AddTargetEntity(ped, {
                     options = {
                         {
+                            type = "client",
                             icon = 'fas fa-shopping-cart',
                             label = 'Alışveriş Yap',
                             action = function()
                                 OpenMarket(marketId)
-                            end
-                        }
+                            end,
+                        },
                     },
-                    distance = 2.5
+                    distance = 2.5,
                 })
             end
         end
