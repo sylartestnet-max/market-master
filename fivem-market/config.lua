@@ -7,16 +7,16 @@ Config = {}
 Config.Framework = 'qb'
 
 -- Envanter sistemi: 'ox' | 'qb' | 'qs' | 'custom'
-Config.Inventory = 'ox'
+Config.Inventory = 'qb'
 
 -- Target sistemi: 'ox' | 'qb' | 'none'
-Config.Target = 'ox'
+Config.Target = 'qb'
 
 -- ═══════════════════════════════════════════════════════════════════
 -- BİLDİRİM SİSTEMİ
 -- ═══════════════════════════════════════════════════════════════════
 -- 'ox' | 'qb' | 'esx' | 'custom'
-Config.Notification = 'ox'
+Config.Notification = 'qb'
 
 -- ═══════════════════════════════════════════════════════════════════
 -- GÜVENLİK AYARLARI
