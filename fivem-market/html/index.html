@@ -156,21 +156,61 @@
     <!-- Item Detail Modal -->
     <div id="item-modal" class="modal hidden">
         <div class="modal-overlay"></div>
-        <div class="modal-content">
+        <div class="modal-content holo-frame-modal">
+            <!-- Corner brackets -->
+            <span class="modal-corner modal-corner-tl"></span>
+            <span class="modal-corner modal-corner-tr"></span>
+            <span class="modal-corner modal-corner-bl"></span>
+            <span class="modal-corner modal-corner-br"></span>
+            <!-- Scan line -->
+            <div class="modal-scan-line"></div>
+
             <button id="modal-close" class="modal-close">✕</button>
+
             <div class="modal-body">
-                <div class="modal-image" id="modal-image">🍔</div>
+                <!-- Image area with rotating rings -->
+                <div class="modal-image-wrap">
+                    <div class="ring ring-outer"></div>
+                    <div class="ring ring-inner"></div>
+                    <div class="modal-image" id="modal-image">🍔</div>
+                </div>
+
                 <div class="modal-info">
-                    <h2 id="modal-name">Ürün Adı</h2>
+                    <h2 id="modal-name" class="neon-text">Ürün Adı</h2>
                     <p id="modal-description" class="modal-desc">Açıklama</p>
-                    <p id="modal-detailed" class="modal-detailed"></p>
-                    <p id="modal-usage" class="modal-usage"></p>
-                    <div class="modal-price">
-                        <span id="modal-price">$0</span>
-                        <span id="modal-original-price" class="original-price hidden">$0</span>
+
+                    <!-- Detail panels -->
+                    <div id="modal-detailed-wrap" class="info-panel info-panel-accent">
+                        <div class="info-panel-header">
+                            <span class="info-icon">ℹ️</span>
+                            <span class="info-title">Ne İşe Yarar?</span>
+                        </div>
+                        <p id="modal-detailed" class="info-body"></p>
                     </div>
-                    <div class="modal-actions">
-                        <button id="modal-add-cart" class="add-cart-btn">Sepete Ekle</button>
+
+                    <div id="modal-usage-wrap" class="info-panel info-panel-secondary">
+                        <div class="info-panel-header">
+                            <span class="info-icon">🔧</span>
+                            <span class="info-title">Nerede Kullanılır?</span>
+                        </div>
+                        <p id="modal-usage" class="info-body"></p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="modal-price-box">
+                            <span class="price-bolt">⚡</span>
+                            <span id="modal-price">$0</span>
+                            <span id="modal-original-price" class="original-price hidden">$0</span>
+                        </div>
+
+                        <div class="modal-qty-selector">
+                            <button class="qty-pill active" data-qty="1">1x</button>
+                            <button class="qty-pill" data-qty="10">10x</button>
+                        </div>
+
+                        <button id="modal-add-cart" class="add-cart-btn">
+                            🛒 Sepete Ekle +
+                        </button>
                     </div>
                 </div>
             </div>

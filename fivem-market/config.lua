@@ -124,39 +124,81 @@ Config.Categories = {
 -- ═══════════════════════════════════════════════════════════════════
 -- ÜRÜNLER
 -- image alanı: emoji (önerilen) veya 'nui://qb-inventory/html/images/bread.png' gibi yol
+-- detailedDescription = modal'da "Ne işe yarar?" bölümünde gözükür
+-- usageInfo            = modal'da "Nerede kullanılır?" bölümünde gözükür
 -- ═══════════════════════════════════════════════════════════════════
 Config.Items = {
     -- YİYECEK
-    ['bread']     = { name = 'Ekmek',          category = 'food',    price = 5,   weight = 100,  image = '🍞', description = 'Taze pişmiş ekmek',  maxStock = 100 },
-    ['sandwich']  = { name = 'Sandviç',        category = 'food',    price = 15,  weight = 200,  image = '🥪', description = 'Lezzetli sandviç',   maxStock = 50  },
-    ['burger']    = { name = 'Hamburger',      category = 'food',    price = 25,  weight = 300,  image = '🍔', description = 'Büyük hamburger',    maxStock = 30  },
-    ['donut']     = { name = 'Donut',          category = 'food',    price = 8,   weight = 100,  image = '🍩', description = 'Tatlı donut',        maxStock = 40  },
+    ['bread']    = { name = 'Ekmek',    category = 'food', price = 5,  weight = 100, image = '🍞', description = 'Taze pişmiş ekmek', maxStock = 100,
+        detailedDescription = 'Sıcak fırından çıkmış taze ekmek. Açlık barınızı %10 oranında doldurur.',
+        usageInfo = 'Envanterden kullanın. Her yerde tüketilebilir.' },
+    ['sandwich'] = { name = 'Sandviç',  category = 'food', price = 15, weight = 200, image = '🥪', description = 'Lezzetli sandviç', maxStock = 50,
+        detailedDescription = 'Taze sebze ve etle hazırlanmış sandviç. Açlık barınızı %20 doldurur.',
+        usageInfo = 'Envanterden kullanın. Sağlığı hafif yeniler.' },
+    ['burger']   = { name = 'Hamburger', category = 'food', price = 25, weight = 300, image = '🍔', description = 'Büyük hamburger', maxStock = 30,
+        detailedDescription = 'Izgara köfte ve özel sosla hazırlanan büyük hamburger. Açlığı %30 doldurur.',
+        usageInfo = 'Envanterden kullanın. Araç sürerken kullanılamaz.' },
+    ['donut']    = { name = 'Donut',    category = 'food', price = 8,  weight = 100, image = '🍩', description = 'Tatlı donut', maxStock = 40,
+        detailedDescription = 'Şekerli donut. Açlığı %15 doldurur ve hız bonusu sağlar (kısa süre).',
+        usageInfo = 'Yürürken bile yiyebilirsiniz.' },
 
     -- İÇECEK
-    ['water']        = { name = 'Su',              category = 'drinks',  price = 3,   weight = 500,  image = '💧', description = 'Saf içme suyu', maxStock = 200 },
-    ['cola']         = { name = 'Kola',            category = 'drinks',  price = 5,   weight = 500,  image = '🥤', description = 'Soğuk kola',    maxStock = 100 },
-    ['coffee']       = { name = 'Kahve',           category = 'drinks',  price = 10,  weight = 300,  image = '☕', description = 'Sıcak kahve',   maxStock = 50  },
-    ['energydrink']  = { name = 'Enerji İçeceği',  category = 'drinks',  price = 20,  weight = 350,  image = '⚡', description = 'Enerji ver',    maxStock = 30  },
+    ['water']       = { name = 'Su',             category = 'drinks', price = 3,  weight = 500, image = '💧', description = 'Saf içme suyu', maxStock = 200,
+        detailedDescription = 'Soğuk ve berrak içme suyu. Susuzluk barınızı %25 doldurur.',
+        usageInfo = 'Envanterden kullanın. Sıcakta vazgeçilmez.' },
+    ['cola']        = { name = 'Kola',           category = 'drinks', price = 5,  weight = 500, image = '🥤', description = 'Soğuk kola', maxStock = 100,
+        detailedDescription = 'Buz gibi gazlı içecek. Susuzluğu %20 doldurur, kafein bonusu verir.',
+        usageInfo = 'Anında içilebilir, sürerken kullanılamaz.' },
+    ['coffee']      = { name = 'Kahve',          category = 'drinks', price = 10, weight = 300, image = '☕', description = 'Sıcak kahve', maxStock = 50,
+        detailedDescription = 'Demlenmiş espresso. Susuzluğu hafif doldurur, stamina yenilenmesini hızlandırır.',
+        usageInfo = 'Sabah saatlerinde idealdir.' },
+    ['energydrink'] = { name = 'Enerji İçeceği', category = 'drinks', price = 20, weight = 350, image = '⚡', description = 'Enerji ver', maxStock = 30,
+        detailedDescription = 'Yüksek kafeinli enerji içeceği. 60 saniye boyunca koşma hızı bonusu sağlar.',
+        usageInfo = 'Yarış ve kovalamacalarda kullanın.' },
 
     -- MEDİKAL
-    ['bandage']     = { name = 'Bandaj',          category = 'medical', price = 50,  weight = 50,   image = '🩹', description = 'İlk yardım bandajı',  maxStock = 50 },
-    ['painkillers'] = { name = 'Ağrı Kesici',     category = 'medical', price = 100, weight = 20,   image = '💊', description = 'Ağrıları azaltır',    maxStock = 30 },
-    ['firstaid']    = { name = 'İlk Yardım Kiti', category = 'medical', price = 250, weight = 500,  image = '🏥', description = 'Tam ilk yardım seti', maxStock = 20 },
+    ['bandage']     = { name = 'Bandaj',          category = 'medical', price = 50,  weight = 50,  image = '🩹', description = 'İlk yardım bandajı', maxStock = 50,
+        detailedDescription = 'Hızlı kanama durdurucu bandaj. Sağlığınızı %25 yeniler.',
+        usageInfo = 'Çatışma sonrası hızlı iyileşme için.' },
+    ['painkillers'] = { name = 'Ağrı Kesici',     category = 'medical', price = 100, weight = 20,  image = '💊', description = 'Ağrıları azaltır', maxStock = 30,
+        detailedDescription = 'Güçlü ağrı kesici hap. Alınan hasarı 30 saniye %15 azaltır.',
+        usageInfo = 'Çatışmaya girmeden önce kullanın.' },
+    ['firstaid']    = { name = 'İlk Yardım Kiti', category = 'medical', price = 250, weight = 500, image = '🏥', description = 'Tam ilk yardım seti', maxStock = 20,
+        detailedDescription = 'Profesyonel ilk yardım kiti. Sağlığınızı %100 yeniler.',
+        usageInfo = 'Acil durumlarda kullanın. Kullanım süresi 8 saniye.' },
 
     -- ARAÇLAR
-    ['flashlight'] = { name = 'El Feneri', category = 'tools', price = 75,  weight = 200, image = '🔦', description = 'Karanlıkta aydınlatma', maxStock = 25 },
-    ['binoculars'] = { name = 'Dürbün',    category = 'tools', price = 150, weight = 400, image = '🔭', description = 'Uzağı görme',           maxStock = 15 },
-    ['lockpick']   = { name = 'Maymuncuk', category = 'tools', price = 200, weight = 50,  image = '🔓', description = 'Kilit açma aracı',      maxStock = 10 },
+    ['flashlight'] = { name = 'El Feneri', category = 'tools', price = 75,  weight = 200, image = '🔦', description = 'Karanlıkta aydınlatma', maxStock = 25,
+        detailedDescription = 'Güçlü LED el feneri. Karanlık alanları aydınlatır.',
+        usageInfo = 'Mağaralarda ve gece keşiflerinde kullanın.' },
+    ['binoculars'] = { name = 'Dürbün',    category = 'tools', price = 150, weight = 400, image = '🔭', description = 'Uzağı görme', maxStock = 15,
+        detailedDescription = 'Profesyonel dürbün. Uzaktaki hedefleri 8x yakınlaştırır.',
+        usageInfo = 'Gözcülük ve keşif görevlerinde idealdir.' },
+    ['lockpick']   = { name = 'Maymuncuk', category = 'tools', price = 200, weight = 50,  image = '🔓', description = 'Kilit açma aracı', maxStock = 10,
+        detailedDescription = 'Sıradan kilitleri açabilen alet. Tek kullanımlıktır.',
+        usageInfo = 'Araba ve ev kapılarına kullanın. Yasadışı.' },
 
     -- HAYATTA KALMA
-    ['tent']    = { name = 'Çadır',  category = 'survival', price = 500, weight = 2000, image = '⛺', description = 'Kamp çadırı',  maxStock = 10 },
-    ['lighter'] = { name = 'Çakmak', category = 'survival', price = 25,  weight = 30,   image = '🔥', description = 'Ateş yakma',  maxStock = 50 },
-    ['rope']    = { name = 'Halat',  category = 'survival', price = 100, weight = 500,  image = '🪢', description = 'Güçlü halat', maxStock = 20 },
+    ['tent']    = { name = 'Çadır',  category = 'survival', price = 500, weight = 2000, image = '⛺', description = 'Kamp çadırı', maxStock = 10,
+        detailedDescription = 'Hızla kurulabilen kamp çadırı. Güvenli kayıt noktası oluşturur.',
+        usageInfo = 'Açık alanlarda kurun. İçinde uyuyarak sağlık yenileyin.' },
+    ['lighter'] = { name = 'Çakmak', category = 'survival', price = 25,  weight = 30,   image = '🔥', description = 'Ateş yakma', maxStock = 50,
+        detailedDescription = 'Klasik benzinli çakmak. Kamp ateşi yakmak için gereklidir.',
+        usageInfo = 'Odun ile birlikte kullanın.' },
+    ['rope']    = { name = 'Halat',  category = 'survival', price = 100, weight = 500,  image = '🪢', description = 'Güçlü halat', maxStock = 20,
+        detailedDescription = 'Naylon kaplı dayanıklı halat. Tırmanma ve bağlama amaçlı.',
+        usageInfo = 'Tırmanma görevlerinde ve görev mekaniklerinde kullanılır.' },
 
     -- BALIKÇILIK
-    ['fishingrod'] = { name = 'Olta',         category = 'fishing', price = 300, weight = 800,  image = '🎣', description = 'Balık tutma oltası',     maxStock = 15  },
-    ['bait']       = { name = 'Yem',          category = 'fishing', price = 10,  weight = 50,   image = '🪱', description = 'Balık yemi',             maxStock = 100 },
-    ['tacklebox']  = { name = 'Olta Kutusu',  category = 'fishing', price = 150, weight = 1000, image = '🧰', description = 'Balıkçılık ekipmanları', maxStock = 10  },
+    ['fishingrod'] = { name = 'Olta',        category = 'fishing', price = 300, weight = 800,  image = '🎣', description = 'Balık tutma oltası', maxStock = 15,
+        detailedDescription = 'Karbon fiber olta. Balıkçılık aktivitesi için zorunludur.',
+        usageInfo = 'Su kenarlarında kullanın. Yem gerekir.' },
+    ['bait']       = { name = 'Yem',         category = 'fishing', price = 10,  weight = 50,   image = '🪱', description = 'Balık yemi', maxStock = 100,
+        detailedDescription = 'Canlı solucan yemi. Her balık tutma denemesinde 1 adet harcanır.',
+        usageInfo = 'Olta ile birlikte kullanılır.' },
+    ['tacklebox']  = { name = 'Olta Kutusu', category = 'fishing', price = 150, weight = 1000, image = '🧰', description = 'Balıkçılık ekipmanları', maxStock = 10,
+        detailedDescription = 'Yedek olta uçları, misina ve aksesuar kutusu. Nadir balık şansını artırır.',
+        usageInfo = 'Envanterde taşıyın, otomatik etki sağlar.' },
 }
 
 -- ═══════════════════════════════════════════════════════════════════

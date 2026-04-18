@@ -168,6 +168,8 @@ local function OpenMarket(marketId)
                     category = itemData.category,
                     image = itemData.image,
                     description = itemData.description,
+                    detailedDescription = itemData.detailedDescription,
+                    usageInfo = itemData.usageInfo,
                     weight = itemData.weight,
                     maxStock = itemData.maxStock,
                 })

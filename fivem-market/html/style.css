@@ -501,6 +501,12 @@ html, body {
   transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
   overflow: hidden;
   isolation: isolate;
+  animation: cardFadeIn 0.4s ease both;
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .product-card::after {
@@ -1081,7 +1087,7 @@ html, body {
 }
 
 /* ============================================
-   ITEM DETAIL MODAL
+   ITEM DETAIL MODAL - HOLOGRAPHIC EDITION
    ============================================ */
 .modal {
   position: fixed;
@@ -1108,29 +1114,60 @@ html, body {
 .modal-content {
   position: relative;
   width: 100%;
-  max-width: 500px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-lg);
+  max-width: 540px;
+  max-height: 88vh;
   overflow: hidden;
-  animation: modalIn 0.3s ease;
+  border-radius: var(--radius-lg);
+  animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo-frame-modal {
+  background:
+    linear-gradient(135deg, hsla(175, 80%, 50%, 0.08), transparent 40%),
+    linear-gradient(315deg, hsla(280, 60%, 55%, 0.08), transparent 40%),
+    var(--bg-secondary);
+  border: 1px solid hsla(175, 80%, 50%, 0.45);
+  box-shadow:
+    0 0 0 1px hsla(175, 80%, 50%, 0.2),
+    0 0 40px hsla(175, 80%, 50%, 0.35),
+    0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1), pulseGlow 3s ease-in-out 0.4s infinite;
 }
 
 @keyframes modalIn {
-  from { 
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to { 
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Modal corner brackets */
+.modal-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: var(--neon-cyan);
+  pointer-events: none;
+  z-index: 5;
+}
+.modal-corner-tl { top: 6px; left: 6px;  border-top: 2px solid; border-left: 2px solid; }
+.modal-corner-tr { top: 6px; right: 6px; border-top: 2px solid; border-right: 2px solid; border-color: var(--neon-purple); }
+.modal-corner-bl { bottom: 6px; left: 6px;  border-bottom: 2px solid; border-left: 2px solid; border-color: var(--neon-purple); }
+.modal-corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* Modal scan line */
+.modal-scan-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  animation: scanDown 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 4;
 }
 
 .modal-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 14px;
+  right: 14px;
   width: 32px;
   height: 32px;
   background: var(--bg-tertiary);
@@ -1142,91 +1179,217 @@ html, body {
   z-index: 10;
   transition: all 0.2s;
 }
-
 .modal-close:hover {
   border-color: var(--neon-red);
   color: var(--neon-red);
+  transform: rotate(90deg);
+  box-shadow: 0 0 12px hsla(0, 65%, 50%, 0.5);
 }
 
 .modal-body {
   display: flex;
   flex-direction: column;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+/* Image area with rotating rings */
+.modal-image-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background:
+    radial-gradient(circle at center, hsla(175, 80%, 50%, 0.15), transparent 65%),
+    linear-gradient(180deg, hsla(175, 80%, 50%, 0.05), transparent);
+  overflow: hidden;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.ring-outer {
+  width: 170px;
+  height: 170px;
+  border: 2px dashed hsla(175, 80%, 50%, 0.35);
+  animation: spinSlow 18s linear infinite;
+}
+.ring-inner {
+  width: 130px;
+  height: 130px;
+  border: 1px dashed hsla(280, 60%, 55%, 0.3);
+  animation: spinSlow 12s linear infinite reverse;
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .modal-image {
-  font-size: 80px;
+  position: relative;
+  z-index: 2;
+  font-size: 88px;
+  line-height: 1;
   text-align: center;
-  padding: 40px;
-  background: linear-gradient(135deg, hsla(175, 80%, 50%, 0.1), transparent);
+  filter: drop-shadow(0 0 25px hsla(175, 80%, 50%, 0.7));
+  animation: floatItem 3s ease-in-out infinite;
+}
+@keyframes floatItem {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
 }
 
-.modal-info {
-  padding: 24px;
-}
+.modal-info { padding: 22px 24px 24px; }
 
 .modal-info h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+  color: var(--neon-cyan);
+  text-align: center;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
 
 .modal-desc {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  margin-bottom: 12px;
+  text-align: center;
+  margin-bottom: 18px;
 }
 
-.modal-detailed, .modal-usage {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+/* Info panels */
+.info-panel {
+  position: relative;
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, hsla(175, 80%, 50%, 0.08), transparent);
+  border: 1px solid hsla(175, 80%, 50%, 0.2);
+  border-left: 3px solid var(--neon-cyan);
+}
+.info-panel-accent {
+  background: linear-gradient(135deg, hsla(145, 70%, 50%, 0.1), transparent);
+  border-color: hsla(145, 70%, 50%, 0.25);
+  border-left-color: var(--neon-green);
+}
+.info-panel-secondary {
+  background: linear-gradient(135deg, hsla(280, 60%, 55%, 0.1), transparent);
+  border-color: hsla(280, 60%, 55%, 0.25);
+  border-left-color: var(--neon-purple);
+}
+
+.info-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.info-icon { font-size: 14px; }
+.info-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.info-panel-accent .info-title { color: var(--neon-green); }
+.info-panel-secondary .info-title { color: var(--neon-purple); }
+
+.info-body {
+  font-size: 0.82rem;
+  color: var(--text-primary);
   line-height: 1.5;
-  margin-bottom: 8px;
-  padding: 12px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius);
+  opacity: 0.9;
 }
 
-.modal-price {
+/* Modal footer */
+.modal-footer {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 16px 0;
+  margin-top: 18px;
+  flex-wrap: wrap;
 }
 
-.modal-price span:first-child {
-  font-size: 1.5rem;
-  font-weight: 700;
+.modal-price-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, hsla(175, 80%, 50%, 0.18), hsla(280, 60%, 55%, 0.15));
+  border: 1px solid hsla(175, 80%, 50%, 0.5);
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: 800;
   color: var(--neon-cyan);
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 14px hsla(175, 80%, 50%, 0.25);
 }
+.price-bolt { font-size: 14px; color: var(--neon-purple); }
 
 .original-price {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   text-decoration: line-through;
+  font-weight: 500;
+  margin-left: 4px;
 }
 
-.modal-actions {
-  margin-top: 16px;
-}
-
-.add-cart-btn {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
-  border: none;
-  border-radius: var(--radius);
-  color: var(--bg-primary);
-  font-size: 1rem;
+.modal-qty-selector { display: flex; gap: 4px; }
+.qty-pill {
+  padding: 9px 14px;
+  background: hsla(220, 25%, 14%, 0.6);
+  border: 1px solid var(--border-secondary);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
 }
-
-.add-cart-btn:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 20px hsla(175, 80%, 50%, 0.4);
+.qty-pill:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
 }
+.qty-pill.active {
+  background: hsla(175, 80%, 50%, 0.2);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px hsla(175, 80%, 50%, 0.3);
+}
+
+.add-cart-btn {
+  flex: 1;
+  min-width: 160px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, hsla(175, 80%, 50%, 0.3), hsla(280, 60%, 55%, 0.3));
+  border: 1px solid hsla(175, 80%, 50%, 0.6);
+  border-radius: 4px;
+  color: var(--neon-cyan);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-transform: uppercase;
+}
+.add-cart-btn:hover {
+  background: linear-gradient(135deg, hsla(175, 80%, 50%, 0.5), hsla(280, 60%, 55%, 0.5));
+  border-color: var(--neon-cyan);
+  color: #fff;
+  transform: scale(1.03);
+  box-shadow: 0 0 24px hsla(175, 80%, 50%, 0.5);
+}
+
+.modal-image .img-icon {
+  width: 96px;
+  height: 96px;
+  filter: drop-shadow(0 0 25px hsla(175, 80%, 50%, 0.7));
+}
+.modal-image .emoji-icon { font-size: 88px; }
 
 /* ============================================
    NOTIFICATION TOAST
