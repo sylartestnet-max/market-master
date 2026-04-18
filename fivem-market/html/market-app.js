@@ -598,9 +598,18 @@
         elements.itemModal.querySelector('.modal-overlay').addEventListener('click', closeItemModal);
         elements.modalAddCart.addEventListener('click', () => {
             if (currentModalItem) {
-                addToCart(currentModalItem.id);
+                addToCart(currentModalItem.id, currentModalQty);
                 closeItemModal();
             }
+        });
+
+        // Quantity pills inside modal
+        document.querySelectorAll('.qty-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                currentModalQty = parseInt(pill.dataset.qty) || 1;
+                document.querySelectorAll('.qty-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+            });
         });
 
         // Search
