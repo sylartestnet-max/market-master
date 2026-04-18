@@ -322,15 +322,16 @@
     // ============================================
     // CART OPERATIONS
     // ============================================
-    function addToCart(itemId) {
+    function addToCart(itemId, qty) {
+        const quantity = qty && qty > 0 ? qty : 1;
         const existing = state.cart.find(item => item.itemId === itemId);
         if (existing) {
-            existing.quantity++;
+            existing.quantity += quantity;
         } else {
-            state.cart.push({ itemId, quantity: 1 });
+            state.cart.push({ itemId, quantity });
         }
         renderCart();
-        showNotification('Ürün sepete eklendi', 'success');
+        showNotification(quantity > 1 ? `${quantity} ürün sepete eklendi` : 'Ürün sepete eklendi', 'success');
     }
 
     function removeFromCart(itemId) {
