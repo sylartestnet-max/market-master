@@ -359,24 +359,33 @@
     // MODAL FUNCTIONS
     // ============================================
     let currentModalItem = null;
+    let currentModalQty = 1;
 
     function openItemModal(itemId) {
         const item = state.config.items.find(i => i.id === itemId);
         if (!item) return;
 
         currentModalItem = item;
+        currentModalQty = 1;
         const hasDiscount = item.id === state.dailyDiscountItemId;
         const price = hasDiscount ? Math.floor(item.price * 0.95) : item.price;
 
         elements.modalImage.innerHTML = renderImage(item.image, '📦');
         elements.modalName.textContent = item.name;
-        elements.modalDescription.textContent = item.description;
-        elements.modalDetailed.textContent = item.detailedDescription || '';
-        elements.modalUsage.textContent = item.usageInfo || '';
-        elements.modalDetailed.classList.toggle('hidden', !item.detailedDescription);
-        elements.modalUsage.classList.toggle('hidden', !item.usageInfo);
+        elements.modalDescription.textContent = item.description || '';
+
+        // Detailed description (with fallback)
+        const detailedText = item.detailedDescription
+            || `${item.name} oyunda çeşitli aktivitelerde kullanılabilir. Envanterinize ekleyerek ihtiyaç duyduğunuzda kullanabilirsiniz.`;
+        elements.modalDetailed.textContent = detailedText;
+
+        // Usage info (with fallback)
+        const usageText = item.usageInfo
+            || 'Bu ürün genel amaçlı kullanım için uygundur. Detaylı bilgi için /help komutunu kullanabilirsiniz.';
+        elements.modalUsage.textContent = usageText;
+
         elements.modalPrice.textContent = formatMoney(price);
-        
+
         if (hasDiscount) {
             elements.modalOriginalPrice.textContent = formatMoney(item.price);
             elements.modalOriginalPrice.classList.remove('hidden');
@@ -384,12 +393,18 @@
             elements.modalOriginalPrice.classList.add('hidden');
         }
 
+        // Reset quantity pills
+        document.querySelectorAll('.qty-pill').forEach(p => {
+            p.classList.toggle('active', parseInt(p.dataset.qty) === 1);
+        });
+
         elements.itemModal.classList.remove('hidden');
     }
 
     function closeItemModal() {
         elements.itemModal.classList.add('hidden');
         currentModalItem = null;
+        currentModalQty = 1;
     }
 
     // ============================================
