@@ -973,6 +973,23 @@
                 renderBalance();
                 renderCart();
                 break;
+            case 'withdrawResult':
+                if (data.success) {
+                    if (data.balance || data.newBalance) {
+                        state.balance = { ...state.balance, ...(data.balance || data.newBalance) };
+                    } else if (pendingWithdrawAmount > 0) {
+                        state.balance.points -= pendingWithdrawAmount;
+                        state.balance.bank += pendingWithdrawAmount;
+                    }
+                    renderBalance();
+                    elements.withdrawAmount.value = '';
+                    closePointsPanel();
+                }
+                pendingWithdrawAmount = 0;
+                if (data.message) {
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                }
+                break;
             case 'updateOwner':
                 const ownerData = data.data || data;
                 state.marketOwner = ownerData.ownerName;
@@ -991,8 +1008,9 @@
                 }
                 break;
             case 'purchaseResult':
+                renderCart();
                 if (data.success) {
-                    recordSales(state.cart.map(item => ({ itemId: item.itemId, quantity: item.quantity })));
+                    recordSales(pendingPurchaseItems);
                     if (data.balance || data.newBalance) {
                         state.balance = { ...state.balance, ...(data.balance || data.newBalance) };
                         renderBalance();
@@ -1000,6 +1018,7 @@
                     clearCart();
                     closeCartDrawer();
                 }
+                pendingPurchaseItems = [];
                 if (data.message) {
                     showNotification(data.message, data.success ? 'success' : 'error');
                 }
