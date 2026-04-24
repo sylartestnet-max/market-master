@@ -21,7 +21,9 @@
         searchQuery: '',
         dailyDiscountItemId: null,
         marketOwner: null,
-        availableMarkets: []
+        availableMarkets: [],
+        salesData: [],
+        selectedSalesItemId: null
     };
 
     // ============================================
@@ -43,6 +45,8 @@
         cartBtn: $('#cart-btn'),
         cartCount: $('#cart-count'),
         closeBtn: $('#close-btn'),
+        statsBtn: $('#stats-btn'),
+        transferBtn: $('#transfer-btn'),
         searchInput: $('#search-input'),
         searchClear: $('#search-clear'),
         categoriesList: $('#categories-list'),
@@ -58,8 +62,24 @@
         pointsPanel: $('#points-panel'),
         pointsValue: $('#points-value'),
         minWithdraw: $('#min-withdraw'),
+        pointsPresets: $('#points-presets'),
         withdrawAmount: $('#withdraw-amount'),
         withdrawBtn: $('#withdraw-btn'),
+        salesPanel: $('#sales-panel'),
+        salesItemsList: $('#sales-items-list'),
+        salesEmpty: $('#sales-empty'),
+        salesDetailContent: $('#sales-detail-content'),
+        salesDetailName: $('#sales-detail-name'),
+        salesDetailTotal: $('#sales-detail-total'),
+        salesDaysGrid: $('#sales-days-grid'),
+        transferPanel: $('#transfer-panel'),
+        transferMarketName: $('#transfer-market-name'),
+        transferCurrentOwner: $('#transfer-current-owner'),
+        transferStatus: $('#transfer-status'),
+        transferOwnerId: $('#transfer-owner-id'),
+        transferOwnerName: $('#transfer-owner-name'),
+        transferConfirm: $('#transfer-confirm'),
+        transferSubmit: $('#transfer-submit'),
         itemModal: $('#item-modal'),
         modalImage: $('#modal-image'),
         modalName: $('#modal-name'),
@@ -125,6 +145,181 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }).then(res => res.json()).catch(() => ({}));
+    }
+
+    function getLast7Days() {
+        const days = [];
+        const now = new Date();
+        for (let i = 6; i >= 0; i -= 1) {
+            const date = new Date(now);
+            date.setDate(now.getDate() - i);
+            days.push({
+                key: date.toISOString().slice(0, 10),
+                label: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'][date.getDay()]
+            });
+        }
+        return days;
+    }
+
+    function createEmptySalesData() {
+        return getLast7Days().map(day => ({
+            date: day.key,
+            label: day.label,
+            items: {}
+        }));
+    }
+
+    function getSelectedSalesItem() {
+        if (!state.selectedSalesItemId || !state.config) return null;
+        const item = state.config.items.find(entry => entry.id === state.selectedSalesItemId);
+        if (!item) return null;
+
+        const total = state.salesData.reduce((sum, day) => sum + (day.items[state.selectedSalesItemId] || 0), 0);
+        return { item, total };
+    }
+
+    function getSalesTotals() {
+        if (!state.config) return [];
+
+        return state.config.items
+            .map(item => ({
+                id: item.id,
+                name: item.name,
+                image: item.image,
+                total: state.salesData.reduce((sum, day) => sum + (day.items[item.id] || 0), 0)
+            }))
+            .filter(item => item.total > 0)
+            .sort((a, b) => b.total - a.total);
+    }
+
+    function recordSales(cartItems) {
+        if (!Array.isArray(cartItems) || cartItems.length === 0) return;
+
+        if (!state.salesData.length) {
+            state.salesData = createEmptySalesData();
+        }
+
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const dayEntry = state.salesData.find(entry => entry.date === todayKey);
+        if (!dayEntry) return;
+
+        cartItems.forEach(cartItem => {
+            dayEntry.items[cartItem.itemId] = (dayEntry.items[cartItem.itemId] || 0) + cartItem.quantity;
+        });
+
+        if (!state.selectedSalesItemId) {
+            state.selectedSalesItemId = cartItems[0].itemId;
+        }
+    }
+
+    function renderPointsPresets() {
+        if (!elements.pointsPresets) return;
+
+        const presets = [500, 1000, 2500, state.balance.points].filter((amount, index, arr) => {
+            return amount >= state.balance.minPointWithdraw && amount <= state.balance.points && arr.indexOf(amount) === index;
+        });
+
+        elements.pointsPresets.innerHTML = presets.map(amount => `
+            <button class="points-preset-btn" data-amount="${amount}">${amount.toLocaleString()}</button>
+        `).join('');
+
+        elements.pointsPresets.querySelectorAll('.points-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                elements.withdrawAmount.value = btn.dataset.amount;
+                elements.withdrawBtn.disabled = false;
+            });
+        });
+    }
+
+    function renderSalesPanel() {
+        if (!elements.salesItemsList || !elements.salesDaysGrid) return;
+
+        const totals = getSalesTotals();
+
+        if (!totals.length) {
+            elements.salesItemsList.innerHTML = '<div class="sales-item-card is-empty">Henüz satış yapılmadı</div>';
+            elements.salesEmpty.classList.remove('hidden');
+            elements.salesDetailContent.classList.add('hidden');
+            return;
+        }
+
+        if (!state.selectedSalesItemId || !totals.some(item => item.id === state.selectedSalesItemId)) {
+            state.selectedSalesItemId = totals[0].id;
+        }
+
+        elements.salesItemsList.innerHTML = totals.map(item => `
+            <button class="sales-item-card ${item.id === state.selectedSalesItemId ? 'active' : ''}" data-item-id="${item.id}">
+                <span class="sales-item-icon">${renderImage(item.image, '📦')}</span>
+                <span class="sales-item-name">${item.name}</span>
+                <span class="sales-item-total">${item.total}</span>
+            </button>
+        `).join('');
+
+        elements.salesItemsList.querySelectorAll('.sales-item-card[data-item-id]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.selectedSalesItemId = btn.dataset.itemId;
+                renderSalesPanel();
+            });
+        });
+
+        const selected = getSelectedSalesItem();
+        if (!selected) {
+            elements.salesEmpty.classList.remove('hidden');
+            elements.salesDetailContent.classList.add('hidden');
+            return;
+        }
+
+        elements.salesEmpty.classList.add('hidden');
+        elements.salesDetailContent.classList.remove('hidden');
+        elements.salesDetailName.textContent = selected.item.name;
+        elements.salesDetailTotal.textContent = selected.total.toLocaleString();
+        elements.salesDaysGrid.innerHTML = state.salesData.map(day => `
+            <div class="sales-day-card">
+                <span class="sales-day-label">${day.label}</span>
+                <strong>${(day.items[selected.item.id] || 0).toLocaleString()}</strong>
+            </div>
+        `).join('');
+    }
+
+    function updateTransferButtonState() {
+        const canTransfer = !!(state.config && state.config.ownable);
+        elements.transferBtn.classList.toggle('disabled', !canTransfer);
+        elements.transferBtn.disabled = !canTransfer;
+        elements.transferBtn.title = canTransfer ? 'Market Devri' : 'Bu market devredilemez';
+    }
+
+    function openSalesPanel() {
+        renderSalesPanel();
+        elements.salesPanel.classList.remove('hidden');
+    }
+
+    function closeSalesPanel() {
+        elements.salesPanel.classList.add('hidden');
+    }
+
+    function openTransferPanel() {
+        if (!state.config) return;
+
+        elements.transferMarketName.textContent = state.config.name;
+        elements.transferCurrentOwner.textContent = state.marketOwner || 'Bu marketin sahibi yok.';
+        elements.transferOwnerId.value = '';
+        elements.transferOwnerName.value = '';
+        elements.transferConfirm.value = '';
+        elements.transferStatus.classList.add('hidden');
+        elements.transferStatus.textContent = '';
+        elements.transferSubmit.disabled = !state.config.ownable;
+
+        if (!state.config.ownable) {
+            elements.transferStatus.textContent = 'Bu market devredilebilir olarak ayarlanmamış.';
+            elements.transferStatus.className = 'transfer-status error';
+            elements.transferStatus.classList.remove('hidden');
+        }
+
+        elements.transferPanel.classList.remove('hidden');
+    }
+
+    function closeTransferPanel() {
+        elements.transferPanel.classList.add('hidden');
     }
 
 
