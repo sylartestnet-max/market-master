@@ -576,6 +576,8 @@
     // ============================================
     let currentModalItem = null;
     let currentModalQty = 1;
+    let pendingPurchaseItems = [];
+    let pendingWithdrawAmount = 0;
 
     function openItemModal(itemId) {
         const item = state.config.items.find(i => i.id === itemId);
@@ -671,32 +673,13 @@
 
         // Check if in FiveM
         if (window.GetParentResourceName) {
+            pendingPurchaseItems = cartSnapshot;
+            elements.purchaseBtn.disabled = true;
+            elements.purchaseBtn.textContent = 'İşleniyor...';
             const result = await fetchNUI('purchase', purchaseData);
-            if (result.success) {
-                showNotification('Satın alma başarılı!', 'success');
-                recordSales(cartSnapshot);
-                
-                // Award points
-                const pointsEarned = Math.floor(totalPrice * 0.05);
-                if (result.newBalance) {
-                    state.balance = {
-                        ...state.balance,
-                        ...result.newBalance,
-                        points: typeof result.newBalance.points === 'number'
-                            ? result.newBalance.points
-                            : state.balance.points + pointsEarned
-                    };
-                    renderBalance();
-                }
-                if (pointsEarned > 0) {
-                    setTimeout(() => {
-                        showNotification(`+${pointsEarned} puan kazandınız!`, 'success');
-                    }, 500);
-                }
-                
-                clearCart();
-                closeCartDrawer();
-            } else {
+            if (result.success === false) {
+                pendingPurchaseItems = [];
+                renderCart();
                 showNotification(result.message || 'Satın alma başarısız!', 'error');
             }
         } else {
@@ -737,16 +720,10 @@
         }
 
         if (window.GetParentResourceName) {
+            pendingWithdrawAmount = amount;
             const result = await fetchNUI('withdrawPoints', { amount });
-            if (result.success) {
-                if (result.newBalance) {
-                    state.balance = { ...state.balance, ...result.newBalance };
-                    renderBalance();
-                }
-                showNotification(`${amount} puan bankaya aktarıldı!`, 'success');
-                elements.withdrawAmount.value = '';
-                closePointsPanel();
-            } else {
+            if (result.success === false) {
+                pendingWithdrawAmount = 0;
                 showNotification(result.message || 'İşlem başarısız!', 'error');
             }
         } else {
