@@ -131,15 +131,40 @@ end)
 
 RegisterNUICallback('transferMarket', function(data, cb)
     if not CanTriggerEvent() then
-        cb({ success = false })
+        cb({ success = false, message = Config.Locale['spam_warning'] })
+        return
+    end
+
+    if not currentMarket then
+        cb({ success = false, message = Config.Locale['market_closed'] })
         return
     end
     
     TriggerServerEvent('market:transferMarket', {
         marketId = currentMarket,
         newOwnerId = data.newOwnerId,
+        newOwnerName = data.newOwnerName,
     })
     
+    cb({ success = true })
+end)
+
+RegisterNUICallback('withdrawPoints', function(data, cb)
+    if not CanTriggerEvent() then
+        cb({ success = false, message = Config.Locale['spam_warning'] })
+        return
+    end
+
+    local amount = math.floor(tonumber(data.amount) or 0)
+    if amount < ((Config.Points and Config.Points.minWithdraw) or 500) then
+        cb({ success = false, message = Config.Locale['invalid_quantity'] })
+        return
+    end
+
+    TriggerServerEvent('market:withdrawPoints', {
+        amount = amount,
+    })
+
     cb({ success = true })
 end)
 
@@ -346,6 +371,28 @@ RegisterNetEvent('market:purchaseResult', function(success, message, newBalance)
     else
         Notify(message, 'error')
     end
+
+    SendNUIMessage({
+        action = 'purchaseResult',
+        success = success,
+        message = message,
+        balance = newBalance
+    })
+end)
+
+RegisterNetEvent('market:withdrawResult', function(success, message, newBalance)
+    if success then
+        Notify(message, 'success')
+    else
+        Notify(message, 'error')
+    end
+
+    SendNUIMessage({
+        action = 'withdrawResult',
+        success = success,
+        message = message,
+        balance = newBalance
+    })
 end)
 
 RegisterNetEvent('market:updateOwner', function(marketId, ownerId, ownerName)
@@ -358,11 +405,26 @@ RegisterNetEvent('market:updateOwner', function(marketId, ownerId, ownerName)
         SendNUIMessage({
             action = 'updateOwner',
             data = {
+                marketId = marketId,
                 ownerId = ownerId,
                 ownerName = ownerName
             }
         })
     end
+end)
+
+RegisterNetEvent('market:transferResult', function(success, message)
+    if success then
+        Notify(message, 'success')
+    else
+        Notify(message, 'error')
+    end
+
+    SendNUIMessage({
+        action = 'transferResult',
+        success = success,
+        message = message
+    })
 end)
 
 -- Export for other resources
