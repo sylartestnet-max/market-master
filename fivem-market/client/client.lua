@@ -216,6 +216,53 @@ local function OpenMarket(marketId)
             })
         end
     end
+
+    local availableMarkets = {}
+    for id, marketData in pairs(Config.Markets) do
+        local marketCategories = {}
+        for _, marketCatId in ipairs(marketData.categories) do
+            local marketCatData = Config.Categories[marketCatId]
+            if marketCatData then
+                table.insert(marketCategories, {
+                    id = marketCatId,
+                    name = marketCatData.name,
+                    icon = marketCatData.icon,
+                    color = marketCatData.color,
+                })
+            end
+        end
+
+        local marketItems = {}
+        for itemId, itemData in pairs(Config.Items) do
+            for _, allowedCategory in ipairs(marketData.categories) do
+                if itemData.category == allowedCategory then
+                    table.insert(marketItems, {
+                        id = itemId,
+                        name = itemData.name,
+                        price = itemData.price,
+                        category = itemData.category,
+                        image = itemData.image,
+                        description = itemData.description,
+                        detailedDescription = itemData.detailedDescription,
+                        usageInfo = itemData.usageInfo,
+                        weight = itemData.weight,
+                        maxStock = itemData.maxStock,
+                    })
+                    break
+                end
+            end
+        end
+
+        table.insert(availableMarkets, {
+            id = id,
+            name = marketData.name,
+            ownerId = marketData.ownerId,
+            ownerName = marketData.ownerName,
+            ownable = marketData.ownable,
+            items = marketItems,
+            categories = marketCategories,
+        })
+    end
     
     -- Get player balance
     local balance = { cash = 0, bank = 0, points = 0 }
@@ -238,6 +285,7 @@ local function OpenMarket(marketId)
             items = items,
             categories = categories,
         },
+        availableMarkets = availableMarkets,
         balance = {
             cash = balance.cash,
             bank = balance.bank,
