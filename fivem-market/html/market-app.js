@@ -332,6 +332,9 @@
         elements.balancePoints.textContent = state.balance.points.toLocaleString();
         elements.pointsValue.textContent = state.balance.points.toLocaleString();
         elements.minWithdraw.textContent = state.balance.minPointWithdraw.toLocaleString();
+        renderPointsPresets();
+        const amount = parseInt(elements.withdrawAmount.value, 10) || 0;
+        elements.withdrawBtn.disabled = amount < state.balance.minPointWithdraw || amount > state.balance.points;
     }
 
     function renderCategories() {
@@ -511,6 +514,23 @@
                     ${market.name}
                 </button>
             `).join('');
+            elements.marketDropdown.querySelectorAll('[data-market-id]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selected = state.availableMarkets.find(market => market.id === btn.dataset.marketId);
+                    if (!selected || selected.id === state.config.id) {
+                        elements.marketDropdown.classList.add('hidden');
+                        return;
+                    }
+
+                    openMarket({
+                        config: selected,
+                        balance: state.balance,
+                        availableMarkets: state.availableMarkets,
+                        salesData: state.salesData
+                    });
+                    elements.marketDropdown.classList.add('hidden');
+                });
+            });
         }
     }
 
@@ -615,6 +635,7 @@
     }
 
     function openPointsPanel() {
+        renderPointsPresets();
         elements.pointsPanel.classList.remove('hidden');
     }
 
