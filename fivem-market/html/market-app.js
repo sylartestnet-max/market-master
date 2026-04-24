@@ -834,6 +834,40 @@
         $('#points-btn').addEventListener('click', openPointsPanel);
         $('#points-close').addEventListener('click', closePointsPanel);
         elements.pointsPanel.querySelector('.drawer-overlay').addEventListener('click', closePointsPanel);
+        elements.statsBtn.addEventListener('click', openSalesPanel);
+        elements.transferBtn.addEventListener('click', openTransferPanel);
+        $('#sales-close').addEventListener('click', closeSalesPanel);
+        elements.salesPanel.querySelector('.modal-overlay').addEventListener('click', closeSalesPanel);
+        $('#transfer-close').addEventListener('click', closeTransferPanel);
+        elements.transferPanel.querySelector('.modal-overlay').addEventListener('click', closeTransferPanel);
+        const handleTransferInput = () => {
+            const canTransfer = !!(
+                state.config &&
+                state.config.ownable &&
+                elements.transferOwnerId.value.trim() &&
+                elements.transferOwnerName.value.trim() &&
+                elements.transferConfirm.value.trim().toUpperCase() === 'DEVRET'
+            );
+            elements.transferSubmit.disabled = !canTransfer;
+        };
+        elements.transferOwnerId.addEventListener('input', handleTransferInput);
+        elements.transferOwnerName.addEventListener('input', handleTransferInput);
+        elements.transferConfirm.addEventListener('input', () => {
+            elements.transferConfirm.value = elements.transferConfirm.value.toUpperCase();
+            handleTransferInput();
+        });
+        elements.transferSubmit.addEventListener('click', async () => {
+            if (elements.transferSubmit.disabled) return;
+            const result = await fetchNUI('transferMarket', {
+                newOwnerId: elements.transferOwnerId.value.trim(),
+                newOwnerName: elements.transferOwnerName.value.trim()
+            });
+            if (result && result.message && !result.success) {
+                elements.transferStatus.textContent = result.message;
+                elements.transferStatus.className = 'transfer-status error';
+                elements.transferStatus.classList.remove('hidden');
+            }
+        });
 
         // Item modal
         $('#modal-close').addEventListener('click', closeItemModal);
@@ -906,6 +940,10 @@
             if (e.key === 'Escape') {
                 if (!elements.itemModal.classList.contains('hidden')) {
                     closeItemModal();
+                } else if (!elements.salesPanel.classList.contains('hidden')) {
+                    closeSalesPanel();
+                } else if (!elements.transferPanel.classList.contains('hidden')) {
+                    closeTransferPanel();
                 } else if (!elements.cartDrawer.classList.contains('hidden')) {
                     closeCartDrawer();
                 } else if (!elements.pointsPanel.classList.contains('hidden')) {
@@ -928,7 +966,12 @@
             case 'openMarket':
                 // Support both {config, balance} (new) and {data: {...}} (old) shapes
                 if (data.config) {
-                    openMarket({ config: data.config, balance: data.balance });
+                    openMarket({
+                        config: data.config,
+                        balance: data.balance,
+                        availableMarkets: data.availableMarkets,
+                        salesData: data.salesData
+                    });
                 } else if (data.data) {
                     const d = data.data;
                     openMarket({
@@ -956,11 +999,40 @@
             case 'updateOwner':
                 const ownerData = data.data || data;
                 state.marketOwner = ownerData.ownerName;
+                if (state.config && ownerData.marketId === state.config.id) {
+                    state.config.ownerId = ownerData.ownerId;
+                    state.config.ownerName = ownerData.ownerName;
+                }
                 if (state.marketOwner) {
                     elements.marketOwner.querySelector('span').textContent = state.marketOwner;
                     elements.marketOwner.classList.remove('hidden');
                 } else {
                     elements.marketOwner.classList.add('hidden');
+                }
+                if (!elements.transferPanel.classList.contains('hidden')) {
+                    elements.transferCurrentOwner.textContent = state.marketOwner || 'Bu marketin sahibi yok.';
+                }
+                break;
+            case 'purchaseResult':
+                if (data.success) {
+                    recordSales(state.cart.map(item => ({ itemId: item.itemId, quantity: item.quantity })));
+                    if (data.balance || data.newBalance) {
+                        state.balance = { ...state.balance, ...(data.balance || data.newBalance) };
+                        renderBalance();
+                    }
+                    clearCart();
+                    closeCartDrawer();
+                }
+                if (data.message) {
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                }
+                break;
+            case 'transferResult':
+                elements.transferStatus.textContent = data.message || (data.success ? 'Market devredildi.' : 'Market devri başarısız.');
+                elements.transferStatus.className = `transfer-status ${data.success ? 'success' : 'error'}`;
+                elements.transferStatus.classList.remove('hidden');
+                if (data.success) {
+                    closeTransferPanel();
                 }
                 break;
         }
@@ -1030,7 +1102,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         initEventListeners();
         initDemo();
-        console.log('[Market] Vanilla JS application initialized');
     });
 
 })();
