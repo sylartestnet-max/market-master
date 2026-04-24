@@ -649,6 +649,8 @@
     async function handlePurchase() {
         if (state.cart.length === 0) return;
 
+        const cartSnapshot = state.cart.map(item => ({ itemId: item.itemId, quantity: item.quantity }));
+
         const totalPrice = state.cart.reduce((sum, cartItem) => {
             const item = state.config.items.find(i => i.id === cartItem.itemId);
             if (!item) return sum;
@@ -672,9 +674,20 @@
             const result = await fetchNUI('purchase', purchaseData);
             if (result.success) {
                 showNotification('Satın alma başarılı!', 'success');
+                recordSales(cartSnapshot);
                 
                 // Award points
                 const pointsEarned = Math.floor(totalPrice * 0.05);
+                if (result.newBalance) {
+                    state.balance = {
+                        ...state.balance,
+                        ...result.newBalance,
+                        points: typeof result.newBalance.points === 'number'
+                            ? result.newBalance.points
+                            : state.balance.points + pointsEarned
+                    };
+                    renderBalance();
+                }
                 if (pointsEarned > 0) {
                     setTimeout(() => {
                         showNotification(`+${pointsEarned} puan kazandınız!`, 'success');
@@ -697,6 +710,7 @@
             // Award points
             const pointsEarned = Math.floor(totalPrice * 0.05);
             state.balance.points += pointsEarned;
+            recordSales(cartSnapshot);
             
             renderBalance();
             showNotification('Satın alma başarılı!', 'success');
@@ -725,7 +739,12 @@
         if (window.GetParentResourceName) {
             const result = await fetchNUI('withdrawPoints', { amount });
             if (result.success) {
+                if (result.newBalance) {
+                    state.balance = { ...state.balance, ...result.newBalance };
+                    renderBalance();
+                }
                 showNotification(`${amount} puan bankaya aktarıldı!`, 'success');
+                elements.withdrawAmount.value = '';
                 closePointsPanel();
             } else {
                 showNotification(result.message || 'İşlem başarısız!', 'error');
@@ -749,6 +768,11 @@
         state.config = data.config;
         state.balance = data.balance;
         state.marketOwner = data.config.ownerName || null;
+        state.availableMarkets = data.availableMarkets || [data.config];
+        state.salesData = data.salesData || state.salesData || createEmptySalesData();
+        if (!state.salesData.length) {
+            state.salesData = createEmptySalesData();
+        }
         state.cart = [];
         state.paymentMethod = 'cash';
         state.searchQuery = '';
@@ -779,6 +803,8 @@
         renderProducts();
         renderCart();
         renderMarketSelector();
+        renderSalesPanel();
+        updateTransferButtonState();
 
         elements.app.classList.remove('hidden');
     }
