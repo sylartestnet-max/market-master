@@ -131,15 +131,40 @@ end)
 
 RegisterNUICallback('transferMarket', function(data, cb)
     if not CanTriggerEvent() then
-        cb({ success = false })
+        cb({ success = false, message = Config.Locale['spam_warning'] })
+        return
+    end
+
+    if not currentMarket then
+        cb({ success = false, message = Config.Locale['market_closed'] })
         return
     end
     
     TriggerServerEvent('market:transferMarket', {
         marketId = currentMarket,
         newOwnerId = data.newOwnerId,
+        newOwnerName = data.newOwnerName,
     })
     
+    cb({ success = true })
+end)
+
+RegisterNUICallback('withdrawPoints', function(data, cb)
+    if not CanTriggerEvent() then
+        cb({ success = false, message = Config.Locale['spam_warning'] })
+        return
+    end
+
+    local amount = math.floor(tonumber(data.amount) or 0)
+    if amount < ((Config.Points and Config.Points.minWithdraw) or 500) then
+        cb({ success = false, message = Config.Locale['invalid_quantity'] })
+        return
+    end
+
+    TriggerServerEvent('market:withdrawPoints', {
+        amount = amount,
+    })
+
     cb({ success = true })
 end)
 
@@ -191,6 +216,53 @@ local function OpenMarket(marketId)
             })
         end
     end
+
+    local availableMarkets = {}
+    for id, marketData in pairs(Config.Markets) do
+        local marketCategories = {}
+        for _, marketCatId in ipairs(marketData.categories) do
+            local marketCatData = Config.Categories[marketCatId]
+            if marketCatData then
+                table.insert(marketCategories, {
+                    id = marketCatId,
+                    name = marketCatData.name,
+                    icon = marketCatData.icon,
+                    color = marketCatData.color,
+                })
+            end
+        end
+
+        local marketItems = {}
+        for itemId, itemData in pairs(Config.Items) do
+            for _, allowedCategory in ipairs(marketData.categories) do
+                if itemData.category == allowedCategory then
+                    table.insert(marketItems, {
+                        id = itemId,
+                        name = itemData.name,
+                        price = itemData.price,
+                        category = itemData.category,
+                        image = itemData.image,
+                        description = itemData.description,
+                        detailedDescription = itemData.detailedDescription,
+                        usageInfo = itemData.usageInfo,
+                        weight = itemData.weight,
+                        maxStock = itemData.maxStock,
+                    })
+                    break
+                end
+            end
+        end
+
+        table.insert(availableMarkets, {
+            id = id,
+            name = marketData.name,
+            ownerId = marketData.ownerId,
+            ownerName = marketData.ownerName,
+            ownable = marketData.ownable,
+            items = marketItems,
+            categories = marketCategories,
+        })
+    end
     
     -- Get player balance
     local balance = { cash = 0, bank = 0, points = 0 }
@@ -213,6 +285,7 @@ local function OpenMarket(marketId)
             items = items,
             categories = categories,
         },
+        availableMarkets = availableMarkets,
         balance = {
             cash = balance.cash,
             bank = balance.bank,
@@ -346,6 +419,28 @@ RegisterNetEvent('market:purchaseResult', function(success, message, newBalance)
     else
         Notify(message, 'error')
     end
+
+    SendNUIMessage({
+        action = 'purchaseResult',
+        success = success,
+        message = message,
+        balance = newBalance
+    })
+end)
+
+RegisterNetEvent('market:withdrawResult', function(success, message, newBalance)
+    if success then
+        Notify(message, 'success')
+    else
+        Notify(message, 'error')
+    end
+
+    SendNUIMessage({
+        action = 'withdrawResult',
+        success = success,
+        message = message,
+        balance = newBalance
+    })
 end)
 
 RegisterNetEvent('market:updateOwner', function(marketId, ownerId, ownerName)
@@ -358,11 +453,26 @@ RegisterNetEvent('market:updateOwner', function(marketId, ownerId, ownerName)
         SendNUIMessage({
             action = 'updateOwner',
             data = {
+                marketId = marketId,
                 ownerId = ownerId,
                 ownerName = ownerName
             }
         })
     end
+end)
+
+RegisterNetEvent('market:transferResult', function(success, message)
+    if success then
+        Notify(message, 'success')
+    else
+        Notify(message, 'error')
+    end
+
+    SendNUIMessage({
+        action = 'transferResult',
+        success = success,
+        message = message
+    })
 end)
 
 -- Export for other resources

@@ -130,6 +130,66 @@ local function AddPoints(source, points)
     end
 end
 
+local function GetPlayerPoints(source)
+    if not Config.Points.Enabled then return 0 end
+
+    if Config.Framework == 'qb' then
+        local Player = QBCore.Functions.GetPlayer(source)
+        if Player then
+            return Player.PlayerData.metadata['marketpoints'] or 0
+        end
+    elseif Config.Framework == 'esx' then
+        local identifier = GetPlayerIdentifier(source)
+        if identifier then
+            local result = MySQL.query.await('SELECT marketpoints FROM users WHERE identifier = ?', { identifier })
+            return result[1] and result[1].marketpoints or 0
+        end
+    end
+
+    return 0
+end
+
+local function RemovePoints(source, points)
+    if not Config.Points.Enabled then return false end
+
+    if Config.Framework == 'qb' then
+        local Player = QBCore.Functions.GetPlayer(source)
+        if Player then
+            local currentPoints = Player.PlayerData.metadata['marketpoints'] or 0
+            if currentPoints < points then return false end
+            Player.Functions.SetMetaData('marketpoints', currentPoints - points)
+            return true
+        end
+    elseif Config.Framework == 'esx' then
+        local identifier = GetPlayerIdentifier(source)
+        if identifier then
+            local currentPoints = GetPlayerPoints(source)
+            if currentPoints < points then return false end
+            MySQL.update('UPDATE users SET marketpoints = marketpoints - ? WHERE identifier = ?', { points, identifier })
+            return true
+        end
+    end
+
+    return false
+end
+
+local function AddBankMoney(source, amount)
+    if Config.Framework == 'qb' then
+        local Player = QBCore.Functions.GetPlayer(source)
+        if Player then
+            return Player.Functions.AddMoney('bank', amount, 'market-points-withdraw')
+        end
+    elseif Config.Framework == 'esx' then
+        local Player = ESX.GetPlayerFromId(source)
+        if Player then
+            Player.addAccountMoney('bank', amount)
+            return true
+        end
+    end
+
+    return false
+end
+
 local function LogPurchase(source, marketId, items, total, paymentMethod)
     if not Config.Security.LogPurchases then return end
     
@@ -283,6 +343,7 @@ RegisterNetEvent('market:purchase', function(data)
     local newBalance = {
         cash = GetPlayerMoney(source, 'cash'),
         bank = GetPlayerMoney(source, 'bank'),
+        points = GetPlayerPoints(source),
     }
     
     -- Success response
@@ -298,17 +359,26 @@ RegisterNetEvent('market:transferMarket', function(data)
     local source = source
     local market = Config.Markets[data.marketId]
     
-    if not market or not market.ownable then return end
+    if not market or not market.ownable then
+        TriggerClientEvent('market:transferResult', source, false, 'Bu market devredilemez.')
+        return
+    end
     
     -- Check if player is current owner
     local playerId = GetPlayerIdentifier(source)
-    if market.ownerId ~= playerId then return end
+    if market.ownerId ~= playerId then
+        TriggerClientEvent('market:transferResult', source, false, 'Sadece mevcut sahip marketi devredebilir.')
+        return
+    end
     
     -- Get new owner info
     local newOwnerSource = GetPlayerByIdentifier(data.newOwnerId)
-    if not newOwnerSource then return end
+    if not newOwnerSource then
+        TriggerClientEvent('market:transferResult', source, false, 'Yeni sahip oyunda bulunamadı.')
+        return
+    end
     
-    local newOwnerName = GetPlayerName(newOwnerSource)
+    local newOwnerName = data.newOwnerName and data.newOwnerName ~= '' and data.newOwnerName or GetPlayerName(newOwnerSource)
     
     -- Update config
     Config.Markets[data.marketId].ownerId = data.newOwnerId
@@ -320,6 +390,40 @@ RegisterNetEvent('market:transferMarket', function(data)
     
     -- Notify all clients
     TriggerClientEvent('market:updateOwner', -1, data.marketId, data.newOwnerId, newOwnerName)
+    TriggerClientEvent('market:transferResult', source, true, 'Market başarıyla devredildi.')
+end)
+
+RegisterNetEvent('market:withdrawPoints', function(data)
+    local source = source
+    local amount = math.floor(tonumber(data.amount) or 0)
+
+    if amount < ((Config.Points and Config.Points.minWithdraw) or 500) then
+        TriggerClientEvent('market:withdrawResult', source, false, 'Geçersiz miktar!')
+        return
+    end
+
+    local currentPoints = GetPlayerPoints(source)
+    if currentPoints < amount then
+        TriggerClientEvent('market:withdrawResult', source, false, 'Yeterli puanınız yok!')
+        return
+    end
+
+    if not RemovePoints(source, amount) then
+        TriggerClientEvent('market:withdrawResult', source, false, 'Puan düşülemedi!')
+        return
+    end
+
+    if not AddBankMoney(source, amount) then
+        AddPoints(source, amount)
+        TriggerClientEvent('market:withdrawResult', source, false, 'Banka bakiyesi güncellenemedi!')
+        return
+    end
+
+    TriggerClientEvent('market:withdrawResult', source, true, ('%s puan bankaya aktarıldı!'):format(amount), {
+        cash = GetPlayerMoney(source, 'cash'),
+        bank = GetPlayerMoney(source, 'bank'),
+        points = GetPlayerPoints(source),
+    })
 end)
 
 -- ═══════════════════════════════════════════════════════════════════
