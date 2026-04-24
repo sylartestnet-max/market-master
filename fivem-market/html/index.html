@@ -54,6 +54,8 @@
                                 <span class="balance-icon">⭐</span>
                                 <span id="balance-points">0</span>
                             </button>
+                            <button id="stats-btn" class="utility-button" title="Satış İstatistikleri">📈</button>
+                            <button id="transfer-btn" class="utility-button" title="Market Devri">🔄</button>
                         </div>
                         
                         <button id="cart-btn" class="cart-button" title="Sepet">
@@ -145,10 +147,81 @@
                 </div>
                 <div class="points-withdraw">
                     <label>Bankaya Aktar:</label>
+                    <div id="points-presets" class="points-presets"></div>
                     <input type="number" id="withdraw-amount" min="0" placeholder="Miktar">
                     <p class="points-min-info">Minimum: <span id="min-withdraw">500</span> puan</p>
                     <button id="withdraw-btn" class="withdraw-btn" disabled>Aktar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Panel -->
+    <div id="sales-panel" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content sales-panel-content holo-frame-modal">
+            <button id="sales-close" class="modal-close">✕</button>
+            <div class="panel-header">
+                <h2 class="neon-text">Haftalık Satış İstatistikleri</h2>
+                <p>Market içi satış görünümü</p>
+            </div>
+            <div class="sales-panel-body">
+                <div id="sales-items-list" class="sales-items-list"></div>
+                <div class="sales-detail-panel">
+                    <div id="sales-empty" class="sales-empty-state">
+                        <span class="sales-empty-icon">📦</span>
+                        <p>Henüz satış kaydı yok</p>
+                    </div>
+                    <div id="sales-detail-content" class="hidden">
+                        <div class="sales-summary-card">
+                            <div>
+                                <p class="sales-summary-label">Seçilen Ürün</p>
+                                <h3 id="sales-detail-name">Ürün</h3>
+                            </div>
+                            <div class="sales-total-box">
+                                <span id="sales-detail-total">0</span>
+                                <small>Toplam Satış</small>
+                            </div>
+                        </div>
+                        <div id="sales-days-grid" class="sales-days-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Panel -->
+    <div id="transfer-panel" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content transfer-panel-content holo-frame-modal">
+            <button id="transfer-close" class="modal-close">✕</button>
+            <div class="panel-header">
+                <h2 class="neon-text">Market Devri</h2>
+                <p id="transfer-market-name">Market</p>
+            </div>
+            <div class="transfer-panel-body">
+                <div class="info-panel">
+                    <div class="info-panel-header">
+                        <span class="info-icon">👤</span>
+                        <span class="info-title">Mevcut Sahip</span>
+                    </div>
+                    <p id="transfer-current-owner" class="info-body">Bu marketin sahibi yok.</p>
+                </div>
+                <div class="info-panel info-panel-secondary">
+                    <div class="info-panel-header">
+                        <span class="info-icon">⚠️</span>
+                        <span class="info-title">Uyarı</span>
+                    </div>
+                    <p class="info-body">Devredildiğinde market bonus puanları yeni sahibine geçer.</p>
+                </div>
+                <div id="transfer-status" class="transfer-status hidden"></div>
+                <label class="transfer-label" for="transfer-owner-id">Yeni Sahip Citizen ID</label>
+                <input id="transfer-owner-id" class="transfer-input" type="text" placeholder="Citizen ID girin">
+                <label class="transfer-label" for="transfer-owner-name">Yeni Sahip Görünen Adı</label>
+                <input id="transfer-owner-name" class="transfer-input" type="text" placeholder="Oyuncu adı girin">
+                <label class="transfer-label" for="transfer-confirm">Onay için DEVRET yazın</label>
+                <input id="transfer-confirm" class="transfer-input" type="text" placeholder="DEVRET">
+                <button id="transfer-submit" class="purchase-btn transfer-submit-btn">Marketi Devret</button>
             </div>
         </div>
     </div>
