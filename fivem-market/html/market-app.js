@@ -56,6 +56,9 @@
         cartItems: $('#cart-items'),
         cartEmpty: $('#cart-empty'),
         cartTotalPrice: $('#cart-total-price'),
+        cartUniqueCount: $('#cart-unique-count'),
+        cartTotalQty: $('#cart-total-qty'),
+        cartEarnedPoints: $('#cart-earned-points'),
         purchaseBtn: $('#purchase-btn'),
         payCash: $('#pay-cash'),
         payBank: $('#pay-bank'),
@@ -484,6 +487,14 @@
         // Update cart total
         elements.cartTotalPrice.textContent = formatMoney(totalPrice);
 
+        // Update cart summary (unique count, total qty, earned points)
+        const uniqueCount = state.cart.length;
+        const pointsRate = (state.balance.pointsPerDollar || 1) * (state.balance.pointsMultiplier || 1);
+        const earnedPoints = Math.floor(totalPrice * 0.05 * pointsRate) || Math.floor(totalPrice * 0.05);
+        if (elements.cartUniqueCount) elements.cartUniqueCount.textContent = uniqueCount;
+        if (elements.cartTotalQty) elements.cartTotalQty.textContent = totalItems;
+        if (elements.cartEarnedPoints) elements.cartEarnedPoints.textContent = '+' + earnedPoints.toLocaleString();
+
         // Check if can afford
         const canAfford = state.paymentMethod === 'cash' 
             ? state.balance.cash >= totalPrice 
@@ -682,6 +693,17 @@
     // ============================================
     // PURCHASE HANDLER
     // ============================================
+    let purchaseTimeoutHandle = null;
+
+    function resetPurchaseButton() {
+        if (purchaseTimeoutHandle) {
+            clearTimeout(purchaseTimeoutHandle);
+            purchaseTimeoutHandle = null;
+        }
+        elements.purchaseBtn.disabled = state.cart.length === 0;
+        renderCart();
+    }
+
     async function handlePurchase() {
         if (state.cart.length === 0) return;
 
@@ -710,10 +732,19 @@
             pendingPurchaseItems = cartSnapshot;
             elements.purchaseBtn.disabled = true;
             elements.purchaseBtn.textContent = 'İşleniyor...';
-            const result = await fetchNUI('purchase', purchaseData);
-            if (result.success === false) {
+
+            // Safety timeout: if server doesn't respond in 12s, reset UI
+            if (purchaseTimeoutHandle) clearTimeout(purchaseTimeoutHandle);
+            purchaseTimeoutHandle = setTimeout(() => {
                 pendingPurchaseItems = [];
-                renderCart();
+                resetPurchaseButton();
+                showNotification('Sunucu yanıt vermedi. Lütfen tekrar deneyin.', 'error');
+            }, 12000);
+
+            const result = await fetchNUI('purchase', purchaseData);
+            if (result && result.success === false) {
+                pendingPurchaseItems = [];
+                resetPurchaseButton();
                 showNotification(result.message || 'Satın alma başarısız!', 'error');
             }
         } else {
@@ -1042,7 +1073,10 @@
                 }
                 break;
             case 'purchaseResult':
-                renderCart();
+                if (purchaseTimeoutHandle) {
+                    clearTimeout(purchaseTimeoutHandle);
+                    purchaseTimeoutHandle = null;
+                }
                 if (data.success) {
                     recordSales(pendingPurchaseItems);
                     if (data.balance || data.newBalance) {
@@ -1051,6 +1085,8 @@
                     }
                     clearCart();
                     closeCartDrawer();
+                } else {
+                    resetPurchaseButton();
                 }
                 pendingPurchaseItems = [];
                 if (data.message) {

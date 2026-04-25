@@ -97,16 +97,29 @@ end
 
 local function CanCarryItem(source, item, quantity)
     if Config.Inventory == 'ox' then
-        return exports.ox_inventory:CanCarryItem(source, item, quantity)
+        local ok, result = pcall(function()
+            return exports.ox_inventory:CanCarryItem(source, item, quantity)
+        end)
+        if ok then return result end
+        return true
     elseif Config.Inventory == 'qb' then
+        -- QB-Inventory: CanCarryItem doesn't always exist; default to allow
         local Player = QBCore.Functions.GetPlayer(source)
-        if Player then
-            local itemData = Config.Items[item]
-            local weight = itemData and itemData.weight or 100
-            return Player.Functions.CanCarryItem(item, quantity) or true -- Fallback
-        end
+        if not Player then return false end
+        local ok, result = pcall(function()
+            if Player.Functions and Player.Functions.CanCarryItem then
+                return Player.Functions.CanCarryItem(item, quantity)
+            end
+            return true
+        end)
+        if ok and result == false then return false end
+        return true
     elseif Config.Inventory == 'qs' then
-        return exports['qs-inventory']:CanCarryItem(source, item, quantity)
+        local ok, result = pcall(function()
+            return exports['qs-inventory']:CanCarryItem(source, item, quantity)
+        end)
+        if ok then return result end
+        return true
     end
     return true
 end
@@ -192,14 +205,14 @@ end
 
 local function LogPurchase(source, marketId, items, total, paymentMethod)
     if not Config.Security.LogPurchases then return end
-    
+
     local identifier = GetPlayerIdentifier(source)
     local itemNames = {}
-    
+
     for _, item in ipairs(items) do
         table.insert(itemNames, item.itemId .. ' x' .. item.quantity)
     end
-    
+
     print(string.format(
         '[MARKET] Player: %s | Market: %s | Items: %s | Total: $%d | Method: %s',
         identifier or source,
@@ -208,10 +221,14 @@ local function LogPurchase(source, marketId, items, total, paymentMethod)
         total,
         paymentMethod
     ))
-    
-    -- Optional: Save to database
-    MySQL.insert('INSERT INTO market_logs (identifier, market_id, items, total, payment_method, timestamp) VALUES (?, ?, ?, ?, ?, NOW())',
-        {identifier, marketId, json.encode(items), total, paymentMethod})
+
+    -- Optional: Save to database (wrapped in pcall so missing table doesn't break purchase)
+    pcall(function()
+        if MySQL and MySQL.insert then
+            MySQL.insert('INSERT INTO market_logs (identifier, market_id, items, total, payment_method, timestamp) VALUES (?, ?, ?, ?, ?, NOW())',
+                {identifier, marketId, json.encode(items), total, paymentMethod})
+        end
+    end)
 end
 
 -- ═══════════════════════════════════════════════════════════════════

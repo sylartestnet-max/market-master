@@ -103,9 +103,14 @@
     <!-- Cart Drawer -->
     <div id="cart-drawer" class="drawer hidden">
         <div class="drawer-overlay"></div>
-        <div class="drawer-content">
+        <div class="drawer-content holo-frame-modal">
+            <span class="modal-corner modal-corner-tl"></span>
+            <span class="modal-corner modal-corner-tr"></span>
+            <span class="modal-corner modal-corner-bl"></span>
+            <span class="modal-corner modal-corner-br"></span>
+            <div class="modal-scan-line"></div>
             <div class="drawer-header">
-                <h2>🛒 Sepetim</h2>
+                <h2 class="neon-text">🛒 Sepetim</h2>
                 <button id="cart-close" class="drawer-close">✕</button>
             </div>
             <div id="cart-items" class="cart-items">
@@ -123,15 +128,29 @@
                         <button id="pay-bank" class="payment-btn" data-method="bank">🏦 Banka</button>
                     </div>
                 </div>
+                <div class="cart-summary">
+                    <div class="cart-summary-row">
+                        <span class="cart-summary-label">📦 Ürün Çeşidi:</span>
+                        <span id="cart-unique-count" class="cart-summary-value">0</span>
+                    </div>
+                    <div class="cart-summary-row">
+                        <span class="cart-summary-label">🔢 Toplam Adet:</span>
+                        <span id="cart-total-qty" class="cart-summary-value">0</span>
+                    </div>
+                    <div class="cart-summary-row points-row">
+                        <span class="cart-summary-label">⭐ Kazanılacak Puan:</span>
+                        <span id="cart-earned-points" class="cart-summary-value points-value-glow">0</span>
+                    </div>
+                </div>
                 <div class="cart-total">
-                    <span>Toplam:</span>
+                    <span>💰 Toplam:</span>
                     <span id="cart-total-price" class="total-price">$0</span>
                 </div>
                 <button id="purchase-btn" class="purchase-btn" disabled>Satın Al</button>
             </div>
         </div>
     </div>
-    
+
     <!-- Points Panel -->
     <div id="points-panel" class="drawer hidden">
         <div class="drawer-overlay"></div>
