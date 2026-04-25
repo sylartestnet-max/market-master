@@ -682,6 +682,17 @@
     // ============================================
     // PURCHASE HANDLER
     // ============================================
+    let purchaseTimeoutHandle = null;
+
+    function resetPurchaseButton() {
+        if (purchaseTimeoutHandle) {
+            clearTimeout(purchaseTimeoutHandle);
+            purchaseTimeoutHandle = null;
+        }
+        elements.purchaseBtn.disabled = state.cart.length === 0;
+        renderCart();
+    }
+
     async function handlePurchase() {
         if (state.cart.length === 0) return;
 
@@ -710,10 +721,19 @@
             pendingPurchaseItems = cartSnapshot;
             elements.purchaseBtn.disabled = true;
             elements.purchaseBtn.textContent = 'İşleniyor...';
-            const result = await fetchNUI('purchase', purchaseData);
-            if (result.success === false) {
+
+            // Safety timeout: if server doesn't respond in 12s, reset UI
+            if (purchaseTimeoutHandle) clearTimeout(purchaseTimeoutHandle);
+            purchaseTimeoutHandle = setTimeout(() => {
                 pendingPurchaseItems = [];
-                renderCart();
+                resetPurchaseButton();
+                showNotification('Sunucu yanıt vermedi. Lütfen tekrar deneyin.', 'error');
+            }, 12000);
+
+            const result = await fetchNUI('purchase', purchaseData);
+            if (result && result.success === false) {
+                pendingPurchaseItems = [];
+                resetPurchaseButton();
                 showNotification(result.message || 'Satın alma başarısız!', 'error');
             }
         } else {
