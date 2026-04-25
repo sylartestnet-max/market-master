@@ -1062,7 +1062,10 @@
                 }
                 break;
             case 'purchaseResult':
-                renderCart();
+                if (purchaseTimeoutHandle) {
+                    clearTimeout(purchaseTimeoutHandle);
+                    purchaseTimeoutHandle = null;
+                }
                 if (data.success) {
                     recordSales(pendingPurchaseItems);
                     if (data.balance || data.newBalance) {
@@ -1071,6 +1074,8 @@
                     }
                     clearCart();
                     closeCartDrawer();
+                } else {
+                    resetPurchaseButton();
                 }
                 pendingPurchaseItems = [];
                 if (data.message) {
