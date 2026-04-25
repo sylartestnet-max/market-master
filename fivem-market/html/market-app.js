@@ -56,6 +56,9 @@
         cartItems: $('#cart-items'),
         cartEmpty: $('#cart-empty'),
         cartTotalPrice: $('#cart-total-price'),
+        cartUniqueCount: $('#cart-unique-count'),
+        cartTotalQty: $('#cart-total-qty'),
+        cartEarnedPoints: $('#cart-earned-points'),
         purchaseBtn: $('#purchase-btn'),
         payCash: $('#pay-cash'),
         payBank: $('#pay-bank'),
@@ -483,6 +486,14 @@
 
         // Update cart total
         elements.cartTotalPrice.textContent = formatMoney(totalPrice);
+
+        // Update cart summary (unique count, total qty, earned points)
+        const uniqueCount = state.cart.length;
+        const pointsRate = (state.balance.pointsPerDollar || 1) * (state.balance.pointsMultiplier || 1);
+        const earnedPoints = Math.floor(totalPrice * 0.05 * pointsRate) || Math.floor(totalPrice * 0.05);
+        if (elements.cartUniqueCount) elements.cartUniqueCount.textContent = uniqueCount;
+        if (elements.cartTotalQty) elements.cartTotalQty.textContent = totalItems;
+        if (elements.cartEarnedPoints) elements.cartEarnedPoints.textContent = '+' + earnedPoints.toLocaleString();
 
         // Check if can afford
         const canAfford = state.paymentMethod === 'cash' 
