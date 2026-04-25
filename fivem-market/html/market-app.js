@@ -389,40 +389,74 @@
         elements.noProducts.classList.add('hidden');
         elements.productsGrid.classList.remove('hidden');
 
-        elements.productsGrid.innerHTML = items.map(item => `
-            <div class="product-card ${item.hasDiscount ? 'has-discount' : ''}" data-item-id="${item.id}">
+        elements.productsGrid.innerHTML = items.map((item, idx) => `
+            <div class="product-card product-sway ${item.hasDiscount ? 'has-discount' : ''}" data-item-id="${item.id}" style="animation-delay:${idx * 60}ms">
                 <span class="corner corner-tl"></span>
                 <span class="corner corner-tr"></span>
                 <span class="corner corner-bl"></span>
                 <span class="corner corner-br"></span>
+                <div class="card-grid-bg"></div>
+                <div class="card-glow"></div>
                 ${item.hasDiscount ? '<div class="discount-badge">✨ %5 İNDİRİM</div>' : ''}
-                <div class="product-image-wrap">
+                <div class="product-image-wrap" data-detail="${item.id}">
                     <div class="product-halo"></div>
+                    <div class="product-pulse-ring"></div>
                     <div class="product-image">${renderImage(item.image, '📦')}</div>
+                    <div class="product-detail-hint">DETAY</div>
                 </div>
                 <div class="product-name">${item.name}</div>
                 <div class="product-desc">${item.description}</div>
-                <div class="product-footer">
+                <div class="product-price-row">
                     <div class="product-price-wrap">
                         <span class="product-price ${item.hasDiscount ? 'discounted' : ''}">${formatMoney(item.price)}</span>
                         ${item.hasDiscount ? `<span class="product-original-price">${formatMoney(item.originalPrice)}</span>` : ''}
                     </div>
-                    <button class="add-to-cart-btn" data-item-id="${item.id}" title="Sepete Ekle">+</button>
+                    <div class="product-qty-selector">
+                        <button class="qty-pill-sm active" data-qty="1" data-item-id="${item.id}">1x</button>
+                        <button class="qty-pill-sm" data-qty="10" data-item-id="${item.id}">10x</button>
+                    </div>
                 </div>
+                <button class="add-to-cart-full" data-item-id="${item.id}">
+                    <span class="atc-icon">🛒</span>
+                    <span class="atc-text">SEPETE EKLE</span>
+                    <span class="atc-icon">+</span>
+                </button>
             </div>
         `).join('');
 
+        // Card body click → open modal (but not on buttons)
+        elements.productsGrid.querySelectorAll('.product-image-wrap[data-detail]').forEach(wrap => {
+            wrap.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openItemModal(wrap.dataset.detail);
+            });
+        });
+
         elements.productsGrid.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                if (e.target.closest('.add-to-cart-btn')) return;
+                if (e.target.closest('.add-to-cart-full') || e.target.closest('.qty-pill-sm') || e.target.closest('.product-image-wrap')) return;
                 openItemModal(card.dataset.itemId);
             });
         });
 
-        elements.productsGrid.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        // Quantity pill toggling per-card
+        elements.productsGrid.querySelectorAll('.qty-pill-sm').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                addToCart(btn.dataset.itemId);
+                const card = btn.closest('.product-card');
+                card.querySelectorAll('.qty-pill-sm').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Full sepete ekle button → use selected qty
+        elements.productsGrid.querySelectorAll('.add-to-cart-full').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const card = btn.closest('.product-card');
+                const activePill = card.querySelector('.qty-pill-sm.active');
+                const qty = activePill ? parseInt(activePill.dataset.qty, 10) : 1;
+                addToCart(btn.dataset.itemId, qty);
             });
         });
     }
