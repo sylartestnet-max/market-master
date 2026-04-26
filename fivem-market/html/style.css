@@ -228,33 +228,13 @@ html, body {
   100% { right: 150%; }
 }
 
-/* Main scan-line — sweeps continuously top→bottom over the whole panel */
+/* Main scan-line — disabled (was creating an unwanted green descending line) */
 .scan-line {
-  position: absolute;
-  top: 0;
-  left: 2px;
-  right: 2px;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    hsla(175, 80%, 50%, 0.2) 20%,
-    hsla(175, 80%, 50%, 0.9) 50%,
-    hsla(175, 80%, 50%, 0.2) 80%,
-    transparent 100%
-  );
-  box-shadow: 0 0 12px hsla(175, 80%, 50%, 0.8);
-  animation: scanDown 4s linear infinite;
-  pointer-events: none;
-  z-index: 50;
-  border-radius: 2px;
+  display: none !important;
 }
 
 @keyframes scanDown {
-  0%   { transform: translateY(0); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { transform: translateY(85vh); opacity: 0; }
+  0%, 100% { opacity: 0; }
 }
 
 .market-inner {
