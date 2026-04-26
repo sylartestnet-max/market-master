@@ -42,27 +42,33 @@
                     <!-- Right: Balance & Controls -->
                     <div class="header-controls">
                         <div class="balance-display">
-                            <div class="balance-item">
-                                <span class="balance-icon">💵</span>
-                                <span id="balance-cash">$0</span>
+                            <div class="balance-item balance-cash-item">
+                                <span class="balance-icon-svg">💵</span>
+                                <span class="balance-label">Nakit:</span>
+                                <span id="balance-cash" class="balance-value-cyan">$0</span>
                             </div>
-                            <div class="balance-item">
-                                <span class="balance-icon">🏦</span>
-                                <span id="balance-bank">$0</span>
+                            <div class="balance-item balance-bank-item">
+                                <span class="balance-icon-svg">🏦</span>
+                                <span class="balance-label">Banka:</span>
+                                <span id="balance-bank" class="balance-value-green">$0</span>
                             </div>
-                            <button id="points-btn" class="balance-item points-btn" title="Puanlar">
-                                <span class="balance-icon">⭐</span>
+
+                            <button id="cart-btn" class="cart-button-pill" title="Sepet">
+                                <span class="cart-icon">🛒</span>
+                                <span class="cart-pill-label">Sepet</span>
+                                <span id="cart-count" class="cart-count hidden">0</span>
+                            </button>
+
+                            <div class="header-divider"></div>
+
+                            <button id="points-btn" class="points-pill-btn" title="Para Puanı">
+                                <span class="balance-icon-svg">🪙</span>
                                 <span id="balance-points">0</span>
                             </button>
-                            <button id="stats-btn" class="utility-button" title="Satış İstatistikleri">📈</button>
-                            <button id="transfer-btn" class="utility-button" title="Market Devri">🔄</button>
+                            <button id="stats-btn" class="utility-button stats-pill-btn" title="Satış İstatistikleri">📈</button>
+                            <button id="transfer-btn" class="utility-button transfer-pill-btn" title="Market Devri">🔄</button>
                         </div>
-                        
-                        <button id="cart-btn" class="cart-button" title="Sepet">
-                            <span class="cart-icon">🛒</span>
-                            <span id="cart-count" class="cart-count hidden">0</span>
-                        </button>
-                        
+
                         <button id="close-btn" class="close-button" title="Kapat">✕</button>
                     </div>
                 </header>
@@ -115,53 +121,77 @@
         </div>
     </div>
     
-    <!-- Cart Drawer -->
+    <!-- Cart Drawer (mirrors React CartDrawer.tsx) -->
     <div id="cart-drawer" class="drawer hidden">
         <div class="drawer-overlay"></div>
-        <div class="drawer-content holo-frame-modal">
+        <div class="drawer-content cart-drawer-content">
             <span class="modal-corner modal-corner-tl"></span>
             <span class="modal-corner modal-corner-tr"></span>
             <span class="modal-corner modal-corner-bl"></span>
             <span class="modal-corner modal-corner-br"></span>
-            <div class="modal-scan-line"></div>
-            <div class="drawer-header">
-                <h2 class="neon-text">🛒 Sepetim</h2>
-                <button id="cart-close" class="drawer-close">✕</button>
+
+            <div class="cart-header-v2">
+                <div class="cart-header-left">
+                    <span class="cart-header-icon">🛍️</span>
+                    <h2 class="cart-header-title">SEPET</h2>
+                    <span id="cart-header-badge" class="cart-header-badge">0</span>
+                </div>
+                <button id="cart-close" class="cart-close-btn">✕</button>
             </div>
+
             <div id="cart-items" class="cart-items">
                 <!-- Cart items will be populated here -->
             </div>
             <div id="cart-empty" class="cart-empty">
-                <span class="cart-empty-icon">🛒</span>
-                <p>Sepetiniz boş</p>
+                <span class="cart-empty-icon">🛍️</span>
+                <p>SEPET BOŞ</p>
             </div>
-            <div class="cart-footer">
-                <div class="payment-selector">
-                    <label>Ödeme Yöntemi:</label>
-                    <div class="payment-options">
-                        <button id="pay-cash" class="payment-btn active" data-method="cash">💵 Nakit</button>
-                        <button id="pay-bank" class="payment-btn" data-method="bank">🏦 Banka</button>
+
+            <div class="cart-footer-v2">
+                <!-- TOPLAM card (big cyan) -->
+                <div class="cart-total-card">
+                    <span class="cart-total-label">TOPLAM</span>
+                    <span class="cart-total-value">
+                        <span class="total-zap">⚡</span>
+                        <span id="cart-total-price">$0</span>
+                    </span>
+                </div>
+
+                <!-- KAZANILACAK PUAN band (purple) -->
+                <div class="cart-points-band">
+                    <span class="cart-points-label">KAZANILACAK PUAN</span>
+                    <span id="cart-earned-points" class="cart-points-value">+0 puan</span>
+                </div>
+
+                <!-- Hidden legacy values (kept for state compat) -->
+                <span id="cart-unique-count" class="hidden">0</span>
+                <span id="cart-total-qty" class="hidden">0</span>
+
+                <!-- Payment method (Nakit/Banka cards) -->
+                <div class="cart-payment-block">
+                    <label class="cart-payment-label">Ödeme Yöntemi</label>
+                    <div class="payment-cards">
+                        <button id="pay-cash" class="payment-card active" data-method="cash">
+                            <span class="payment-card-icon">💵</span>
+                            <div class="payment-card-text">
+                                <span class="payment-card-title">Nakit</span>
+                                <span id="pay-cash-amount" class="payment-card-amount">$0</span>
+                            </div>
+                        </button>
+                        <button id="pay-bank" class="payment-card" data-method="bank">
+                            <span class="payment-card-icon">🏦</span>
+                            <div class="payment-card-text">
+                                <span class="payment-card-title">Banka</span>
+                                <span id="pay-bank-amount" class="payment-card-amount">$0</span>
+                            </div>
+                        </button>
                     </div>
                 </div>
-                <div class="cart-summary">
-                    <div class="cart-summary-row">
-                        <span class="cart-summary-label">📦 Ürün Çeşidi:</span>
-                        <span id="cart-unique-count" class="cart-summary-value">0</span>
-                    </div>
-                    <div class="cart-summary-row">
-                        <span class="cart-summary-label">🔢 Toplam Adet:</span>
-                        <span id="cart-total-qty" class="cart-summary-value">0</span>
-                    </div>
-                    <div class="cart-summary-row points-row">
-                        <span class="cart-summary-label">⭐ Kazanılacak Puan:</span>
-                        <span id="cart-earned-points" class="cart-summary-value points-value-glow">0</span>
-                    </div>
-                </div>
-                <div class="cart-total">
-                    <span>💰 Toplam:</span>
-                    <span id="cart-total-price" class="total-price">$0</span>
-                </div>
-                <button id="purchase-btn" class="purchase-btn" disabled>Satın Al</button>
+
+                <button id="purchase-btn" class="purchase-btn-v2" disabled>
+                    <span class="purchase-card-icon">💳</span>
+                    <span class="purchase-text">SATIN AL</span>
+                </button>
             </div>
         </div>
     </div>

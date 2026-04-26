@@ -476,13 +476,17 @@
             return sum + (price * item.quantity);
         }, 0);
 
-        // Update cart count badge
+        // Update cart count badge (header pill)
         if (totalItems > 0) {
             elements.cartCount.textContent = totalItems;
             elements.cartCount.classList.remove('hidden');
         } else {
             elements.cartCount.classList.add('hidden');
         }
+
+        // Update header SEPET badge inside drawer
+        const headerBadge = document.getElementById('cart-header-badge');
+        if (headerBadge) headerBadge.textContent = totalItems;
 
         // Update cart total
         elements.cartTotalPrice.textContent = formatMoney(totalPrice);
@@ -493,7 +497,13 @@
         const earnedPoints = Math.floor(totalPrice * 0.05 * pointsRate) || Math.floor(totalPrice * 0.05);
         if (elements.cartUniqueCount) elements.cartUniqueCount.textContent = uniqueCount;
         if (elements.cartTotalQty) elements.cartTotalQty.textContent = totalItems;
-        if (elements.cartEarnedPoints) elements.cartEarnedPoints.textContent = '+' + earnedPoints.toLocaleString();
+        if (elements.cartEarnedPoints) elements.cartEarnedPoints.textContent = '+' + earnedPoints.toLocaleString() + ' puan';
+
+        // Update payment-card amounts
+        const payCashAmount = document.getElementById('pay-cash-amount');
+        const payBankAmount = document.getElementById('pay-bank-amount');
+        if (payCashAmount) payCashAmount.textContent = formatMoney(state.balance.cash || 0);
+        if (payBankAmount) payBankAmount.textContent = formatMoney(state.balance.bank || 0);
 
         // Check if can afford
         const canAfford = state.paymentMethod === 'cash' 
@@ -501,9 +511,10 @@
             : state.balance.bank >= totalPrice;
         
         elements.purchaseBtn.disabled = state.cart.length === 0 || !canAfford;
-        elements.purchaseBtn.textContent = !canAfford && state.cart.length > 0 
-            ? 'Yetersiz Bakiye' 
-            : 'Satın Al';
+        const purchaseTextEl = elements.purchaseBtn.querySelector('.purchase-text');
+        const purchaseLabel = !canAfford && state.cart.length > 0 ? 'YETERSİZ BAKİYE' : 'SATIN AL';
+        if (purchaseTextEl) purchaseTextEl.textContent = purchaseLabel;
+        else elements.purchaseBtn.textContent = purchaseLabel;
 
         // Render cart items
         if (state.cart.length === 0) {
@@ -521,31 +532,44 @@
             const price = cartItem.itemId === state.dailyDiscountItemId 
                 ? Math.floor(item.price * 0.95) 
                 : item.price;
+            const subtotal = price * cartItem.quantity;
             return `
-                <div class="cart-item" data-item-id="${item.id}">
+                <div class="cart-item-v2" data-item-id="${item.id}">
                     <div class="cart-item-image">${renderImage(item.image, '📦')}</div>
                     <div class="cart-item-info">
                         <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">${formatMoney(price)} × ${cartItem.quantity}</div>
+                        <div class="cart-item-price">${formatMoney(price)} / adet</div>
                     </div>
-                    <div class="cart-item-controls">
-                        <button class="qty-btn qty-minus" data-item-id="${item.id}">−</button>
-                        <span class="cart-item-qty">${cartItem.quantity}</span>
-                        <button class="qty-btn qty-plus" data-item-id="${item.id}">+</button>
-                        <button class="cart-item-remove" data-item-id="${item.id}">✕</button>
+                    <div class="cart-item-controls-v2">
+                        <button class="qty-btn-v2 qty-minus" data-item-id="${item.id}">−</button>
+                        <input type="number" class="qty-input" data-item-id="${item.id}" value="${cartItem.quantity}" min="1" />
+                        <button class="qty-btn-v2 qty-plus" data-item-id="${item.id}">+</button>
                     </div>
+                    <div class="cart-item-subtotal">${formatMoney(subtotal)}</div>
+                    <button class="cart-item-trash" data-item-id="${item.id}" title="Sil">🗑️</button>
                 </div>
             `;
         }).join('');
 
-        // Add event listeners
+        // Event listeners
         elements.cartItems.querySelectorAll('.qty-minus').forEach(btn => {
             btn.addEventListener('click', () => updateQuantity(btn.dataset.itemId, -1));
         });
         elements.cartItems.querySelectorAll('.qty-plus').forEach(btn => {
             btn.addEventListener('click', () => updateQuantity(btn.dataset.itemId, 1));
         });
-        elements.cartItems.querySelectorAll('.cart-item-remove').forEach(btn => {
+        elements.cartItems.querySelectorAll('.qty-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const val = parseInt(e.target.value, 10);
+                if (isNaN(val) || val <= 0) {
+                    removeFromCart(input.dataset.itemId);
+                } else {
+                    setQuantity(input.dataset.itemId, val);
+                }
+            });
+            input.addEventListener('click', (e) => e.target.select());
+        });
+        elements.cartItems.querySelectorAll('.cart-item-trash').forEach(btn => {
             btn.addEventListener('click', () => removeFromCart(btn.dataset.itemId));
         });
     }
@@ -609,6 +633,14 @@
         } else {
             renderCart();
         }
+    }
+
+    function setQuantity(itemId, quantity) {
+        const item = state.cart.find(i => i.itemId === itemId);
+        if (!item) return;
+        const q = Math.max(1, Math.min(999, parseInt(quantity, 10) || 1));
+        item.quantity = q;
+        renderCart();
     }
 
     function clearCart() {
