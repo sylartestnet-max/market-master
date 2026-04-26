@@ -2059,13 +2059,25 @@ html, body {
    CART DRAWER ENHANCEMENTS - Frame & Effects
    ============================================ */
 #cart-drawer .drawer-content {
+  /* Force right-side slide-in, override holo-frame-modal modalIn animation */
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
+  width: 420px !important;
+  max-width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+  transform: none;
   background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
   border-left: 2px solid var(--neon-cyan);
+  border-radius: 0 !important;
   box-shadow:
     -10px 0 40px hsla(175, 80%, 50%, 0.25),
     inset 0 0 60px hsla(175, 80%, 50%, 0.05);
-  position: relative;
   overflow: hidden;
+  animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 #cart-drawer .drawer-content::before {
