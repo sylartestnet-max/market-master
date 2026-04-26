@@ -42,27 +42,33 @@
                     <!-- Right: Balance & Controls -->
                     <div class="header-controls">
                         <div class="balance-display">
-                            <div class="balance-item">
-                                <span class="balance-icon">💵</span>
-                                <span id="balance-cash">$0</span>
+                            <div class="balance-item balance-cash-item">
+                                <span class="balance-icon-svg">💵</span>
+                                <span class="balance-label">Nakit:</span>
+                                <span id="balance-cash" class="balance-value-cyan">$0</span>
                             </div>
-                            <div class="balance-item">
-                                <span class="balance-icon">🏦</span>
-                                <span id="balance-bank">$0</span>
+                            <div class="balance-item balance-bank-item">
+                                <span class="balance-icon-svg">🏦</span>
+                                <span class="balance-label">Banka:</span>
+                                <span id="balance-bank" class="balance-value-green">$0</span>
                             </div>
-                            <button id="points-btn" class="balance-item points-btn" title="Puanlar">
-                                <span class="balance-icon">⭐</span>
+
+                            <button id="cart-btn" class="cart-button-pill" title="Sepet">
+                                <span class="cart-icon">🛒</span>
+                                <span class="cart-pill-label">Sepet</span>
+                                <span id="cart-count" class="cart-count hidden">0</span>
+                            </button>
+
+                            <div class="header-divider"></div>
+
+                            <button id="points-btn" class="points-pill-btn" title="Para Puanı">
+                                <span class="balance-icon-svg">🪙</span>
                                 <span id="balance-points">0</span>
                             </button>
-                            <button id="stats-btn" class="utility-button" title="Satış İstatistikleri">📈</button>
-                            <button id="transfer-btn" class="utility-button" title="Market Devri">🔄</button>
+                            <button id="stats-btn" class="utility-button stats-pill-btn" title="Satış İstatistikleri">📈</button>
+                            <button id="transfer-btn" class="utility-button transfer-pill-btn" title="Market Devri">🔄</button>
                         </div>
-                        
-                        <button id="cart-btn" class="cart-button" title="Sepet">
-                            <span class="cart-icon">🛒</span>
-                            <span id="cart-count" class="cart-count hidden">0</span>
-                        </button>
-                        
+
                         <button id="close-btn" class="close-button" title="Kapat">✕</button>
                     </div>
                 </header>
