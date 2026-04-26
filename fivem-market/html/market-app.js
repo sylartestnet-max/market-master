@@ -635,6 +635,14 @@
         }
     }
 
+    function setQuantity(itemId, quantity) {
+        const item = state.cart.find(i => i.itemId === itemId);
+        if (!item) return;
+        const q = Math.max(1, Math.min(999, parseInt(quantity, 10) || 1));
+        item.quantity = q;
+        renderCart();
+    }
+
     function clearCart() {
         state.cart = [];
         renderCart();
