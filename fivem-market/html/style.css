@@ -131,17 +131,26 @@ html, body {
   position: absolute;
   inset: -2px;
   border-radius: var(--radius-lg);
+  padding: 2px;
   background: linear-gradient(
     90deg,
     var(--neon-cyan),
     var(--neon-green),
     var(--neon-purple),
+    var(--neon-pink),
     var(--neon-cyan)
   );
   background-size: 400% 100%;
-  animation: borderFlow 6s linear infinite;
-  z-index: -1;
-  opacity: 0.55;
+  animation: borderFlow 5s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 8px hsla(175, 80%, 50%, 0.5));
 }
 
 @keyframes borderFlow {
@@ -157,15 +166,16 @@ html, body {
   background: linear-gradient(
     45deg,
     transparent 0%,
-    hsla(175, 80%, 50%, 0.06) 25%,
+    hsla(175, 80%, 50%, 0.08) 25%,
     transparent 50%,
-    hsla(280, 60%, 55%, 0.06) 75%,
+    hsla(280, 60%, 55%, 0.08) 75%,
     transparent 100%
   );
   background-size: 200% 200%;
   animation: holoShift 8s ease-in-out infinite;
   pointer-events: none;
   border-radius: var(--radius-lg);
+  z-index: 0;
 }
 
 @keyframes holoShift {
@@ -174,8 +184,8 @@ html, body {
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 10px hsla(175, 80%, 50%, 0.3); }
-  50% { box-shadow: 0 0 25px hsla(175, 80%, 50%, 0.5); }
+  0%, 100% { box-shadow: 0 0 15px hsla(175, 80%, 50%, 0.35), 0 0 40px hsla(175, 80%, 50%, 0.15); }
+  50%      { box-shadow: 0 0 30px hsla(175, 80%, 50%, 0.55), 0 0 60px hsla(280, 60%, 55%, 0.25); }
 }
 
 /* Header data-stream flowing line */
@@ -187,23 +197,25 @@ html, body {
 .market-header::before {
   content: '';
   position: absolute;
-  top: 0; left: -100%;
+  top: 0; left: -50%;
   width: 50%;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
   animation: dataFlow 3s linear infinite;
   pointer-events: none;
+  z-index: 5;
 }
 
 .market-header::after {
   content: '';
   position: absolute;
-  bottom: 0; right: -100%;
+  bottom: 0; right: -50%;
   width: 50%;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
   animation: dataFlowReverse 3s linear infinite 1.5s;
   pointer-events: none;
+  z-index: 5;
 }
 
 @keyframes dataFlow {
@@ -216,23 +228,33 @@ html, body {
   100% { right: 150%; }
 }
 
+/* Main scan-line — sweeps continuously top→bottom over the whole panel */
 .scan-line {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  left: 2px;
+  right: 2px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-  animation: scanDown 3s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsla(175, 80%, 50%, 0.2) 20%,
+    hsla(175, 80%, 50%, 0.9) 50%,
+    hsla(175, 80%, 50%, 0.2) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px hsla(175, 80%, 50%, 0.8);
+  animation: scanDown 4s linear infinite;
   pointer-events: none;
-  z-index: 10;
+  z-index: 50;
+  border-radius: 2px;
 }
 
 @keyframes scanDown {
-  0%, 100% { top: 0; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(85vh); opacity: 0; }
 }
 
 .market-inner {
