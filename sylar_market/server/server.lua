@@ -410,8 +410,15 @@ end)
 
 RegisterNetEvent('market:transferMarket', function(data)
     local source = source
+
+    -- DEV yetkisi kontrolü (sadece dev marketi devredebilir)
+    if not IsPlayerDev(source) then
+        TriggerClientEvent('market:transferResult', source, false, 'Bu işlem için DEV yetkisi gereklidir.')
+        return
+    end
+
     local market = Config.Markets[data.marketId]
-    
+
     if not market or not market.ownable then
         TriggerClientEvent('market:transferResult', source, false, 'Bu market devredilemez.')
         return
