@@ -1093,7 +1093,8 @@
                         config: data.config,
                         balance: data.balance,
                         availableMarkets: data.availableMarkets,
-                        salesData: data.salesData
+                        salesData: data.salesData,
+                        isDev: data.isDev
                     });
                 } else if (data.data) {
                     const d = data.data;
@@ -1107,9 +1108,14 @@
                             items: d.items || [],
                             categories: d.categories || []
                         },
-                        balance: d.balance || { cash: 0, bank: 0, points: 0, minPointWithdraw: 500 }
+                        balance: d.balance || { cash: 0, bank: 0, points: 0, minPointWithdraw: 500 },
+                        isDev: d.isDev
                     });
                 }
+                break;
+            case 'updateDevStatus':
+                state.isDev = !!data.isDev;
+                updateTransferButtonState();
                 break;
             case 'closeMarket':
                 closeMarket();
