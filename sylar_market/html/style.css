@@ -100,8 +100,9 @@ html, body {
 .market-container {
   position: relative;
   width: 100%;
-  max-width: 1400px;
-  height: 85vh;
+  max-width: 1280px;
+  height: 73vh;
+  max-height: 73vh;
   overflow: hidden;
   border-radius: var(--radius-lg);
 }
