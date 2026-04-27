@@ -17,7 +17,7 @@ Modern, güvenli ve özelleştirilebilir FiveM market scripti.
 ## 📁 Dosya Yapısı
 
 ```
-fivem-market/
+sylar_market/
 ├── fxmanifest.lua      # Resource manifest
 ├── config.lua          # Tüm ayarlar
 ├── client/
@@ -55,7 +55,7 @@ npm install
 npm run build
 
 # ✅ Artık kopyalama gerekmiyor:
-# Build çıktısı otomatik olarak fivem-market/html/assets/ui/ içine yazılır.
+# Build çıktısı otomatik olarak sylar_market/html/assets/ui/ içine yazılır.
 ```
 
 
@@ -74,7 +74,7 @@ Config.Target = 'ox'    -- 'ox', 'qb', veya 'none'
 ensure oxmysql
 ensure qb-core -- veya es_extended
 ensure ox_inventory -- veya kullandığınız inventory
-ensure fivem-market
+ensure sylar_market
 ```
 
 ## ⚙️ Konfigürasyon
@@ -138,7 +138,7 @@ Config.Categories['yeni_kategori'] = {
 
 ```lua
 -- Marketi açmak için
-exports['fivem-market']:OpenMarket('market_id')
+exports['sylar_market']:OpenMarket('market_id')
 ```
 
 ## 🎯 Events

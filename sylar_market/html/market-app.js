@@ -37,8 +37,6 @@
         marketName: $('#market-name'),
         marketOwner: $('#market-owner'),
         currentMarketName: $('#current-market-name'),
-        marketDropdown: $('#market-dropdown'),
-        selectorBtn: $('#market-selector-btn'),
         balanceCash: $('#balance-cash'),
         balanceBank: $('#balance-bank'),
         balancePoints: $('#balance-points'),
@@ -139,7 +137,7 @@
     }
 
     function getResourceName() {
-        return window.GetParentResourceName ? window.GetParentResourceName() : 'fivem-market';
+        return window.GetParentResourceName ? window.GetParentResourceName() : 'sylar_market';
     }
 
     function fetchNUI(eventName, data = {}) {
@@ -282,6 +280,73 @@
                 <strong>${(day.items[selected.item.id] || 0).toLocaleString()}</strong>
             </div>
         `).join('');
+
+        // Render bar chart (SVG)
+        renderSalesChart(selected.item.id);
+    }
+
+    function renderSalesChart(itemId) {
+        const wrap = document.getElementById('sales-chart-wrap');
+        if (!wrap) return;
+
+        const days = state.salesData.map(day => ({
+            label: day.label,
+            value: day.items[itemId] || 0
+        }));
+
+        const maxVal = Math.max(1, ...days.map(d => d.value));
+        const W = 560, H = 220;
+        const padL = 36, padR = 12, padT = 16, padB = 32;
+        const chartW = W - padL - padR;
+        const chartH = H - padT - padB;
+        const barGap = 12;
+        const barW = (chartW - barGap * (days.length - 1)) / days.length;
+
+        // Y axis ticks (4 lines)
+        const ticks = 4;
+        const tickLines = [];
+        for (let i = 0; i <= ticks; i += 1) {
+            const y = padT + (chartH * i) / ticks;
+            const val = Math.round(maxVal * (1 - i / ticks));
+            tickLines.push(`
+                <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}"
+                    stroke="hsla(175, 80%, 50%, 0.12)" stroke-width="1" stroke-dasharray="3 3"/>
+                <text x="${padL - 6}" y="${y + 4}" text-anchor="end"
+                    fill="hsla(200, 15%, 55%, 0.85)" font-size="10" font-family="Segoe UI, sans-serif">${val}</text>
+            `);
+        }
+
+        const bars = days.map((d, i) => {
+            const x = padL + i * (barW + barGap);
+            const h = (d.value / maxVal) * chartH;
+            const y = padT + chartH - h;
+            const labelY = padT + chartH + 18;
+            const valueY = y - 6;
+            return `
+                <defs>
+                    <linearGradient id="barGrad${i}" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="hsl(175, 80%, 60%)" stop-opacity="1"/>
+                        <stop offset="100%" stop-color="hsl(175, 80%, 40%)" stop-opacity="0.85"/>
+                    </linearGradient>
+                </defs>
+                <rect x="${x}" y="${y}" width="${barW}" height="${h}"
+                    rx="4" ry="4" fill="url(#barGrad${i})"
+                    style="filter: drop-shadow(0 0 6px hsla(175, 80%, 50%, 0.45));"/>
+                ${d.value > 0 ? `<text x="${x + barW / 2}" y="${valueY}" text-anchor="middle"
+                    fill="hsl(175, 80%, 70%)" font-size="11" font-weight="700"
+                    font-family="Segoe UI, sans-serif">${d.value}</text>` : ''}
+                <text x="${x + barW / 2}" y="${labelY}" text-anchor="middle"
+                    fill="hsla(200, 15%, 65%, 0.95)" font-size="11"
+                    font-family="Segoe UI, sans-serif">${d.label}</text>
+            `;
+        }).join('');
+
+        wrap.innerHTML = `
+            <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="sales-chart-svg">
+                ${tickLines.join('')}
+                ${bars}
+            </svg>
+        `;
     }
 
     function updateTransferButtonState() {
@@ -575,31 +640,9 @@
     }
 
     function renderMarketSelector() {
-        elements.currentMarketName.textContent = state.config ? state.config.name.split(' - ')[0] : 'Market';
-        
-        if (state.availableMarkets.length > 0) {
-            elements.marketDropdown.innerHTML = state.availableMarkets.map(market => `
-                <button class="${market.id === state.config?.id ? 'active' : ''}" data-market-id="${market.id}">
-                    ${market.name}
-                </button>
-            `).join('');
-            elements.marketDropdown.querySelectorAll('[data-market-id]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const selected = state.availableMarkets.find(market => market.id === btn.dataset.marketId);
-                    if (!selected || selected.id === state.config.id) {
-                        elements.marketDropdown.classList.add('hidden');
-                        return;
-                    }
-
-                    openMarket({
-                        config: selected,
-                        balance: state.balance,
-                        availableMarkets: state.availableMarkets,
-                        salesData: state.salesData
-                    });
-                    elements.marketDropdown.classList.add('hidden');
-                });
-            });
+        // Sadece bulunduğu marketin adını gösterir (NPC bazlı, seçim yok)
+        if (state.config) {
+            elements.currentMarketName.textContent = state.config.name;
         }
     }
 
@@ -999,15 +1042,7 @@
         });
         elements.withdrawBtn.addEventListener('click', handleWithdraw);
 
-        // Market selector
-        elements.selectorBtn.addEventListener('click', () => {
-            elements.marketDropdown.classList.toggle('hidden');
-        });
-        document.addEventListener('click', (e) => {
-            if (!elements.selectorBtn.contains(e.target)) {
-                elements.marketDropdown.classList.add('hidden');
-            }
-        });
+        // (Market selector kaldırıldı - NPC bazlı tek market gösterimi)
 
         // ESC key
         document.addEventListener('keydown', (e) => {
@@ -1184,11 +1219,21 @@
 
         // Check if not in FiveM and no market data
         if (!window.GetParentResourceName) {
+            // Generate demo sales data for chart preview
+            const demoSales = createEmptySalesData();
+            const demoItemIds = ['burger', 'pizza', 'cola', 'water', 'medkit', 'bandage', 'energy'];
+            demoSales.forEach(day => {
+                demoItemIds.forEach(id => {
+                    day.items[id] = Math.floor(Math.random() * 35) + 5;
+                });
+            });
+
             // Auto-open in demo mode after 1 second
             setTimeout(() => {
                 openMarket({
                     config: demoConfig,
-                    balance: demoBalance
+                    balance: demoBalance,
+                    salesData: demoSales
                 });
             }, 500);
         }

@@ -21,16 +21,10 @@
             <div class="market-inner">
                 <!-- Header Bar -->
                 <header class="market-header">
-                    <!-- Left: Market Selector -->
-                    <div class="market-selector">
-                        <button id="market-selector-btn" class="selector-btn">
-                            <span class="selector-icon">🏪</span>
-                            <span id="current-market-name">Market</span>
-                            <span class="selector-arrow">▼</span>
-                        </button>
-                        <div id="market-dropdown" class="selector-dropdown hidden">
-                            <!-- Markets will be populated here -->
-                        </div>
+                    <!-- Left: Current Market Label (read-only, NPC-based) -->
+                    <div class="market-location">
+                        <span class="market-location-icon">📍</span>
+                        <span id="current-market-name" class="market-location-name">Market</span>
                     </div>
                     
                     <!-- Center: Market Name & Owner -->
@@ -241,11 +235,15 @@
                             <div>
                                 <p class="sales-summary-label">Seçilen Ürün</p>
                                 <h3 id="sales-detail-name">Ürün</h3>
+                                <p class="sales-summary-sub">Son 7 günlük satış grafiği</p>
                             </div>
                             <div class="sales-total-box">
                                 <span id="sales-detail-total">0</span>
                                 <small>Toplam Satış</small>
                             </div>
+                        </div>
+                        <div id="sales-chart-wrap" class="sales-chart-wrap">
+                            <!-- Bar chart SVG injected here -->
                         </div>
                         <div id="sales-days-grid" class="sales-days-grid"></div>
                     </div>
