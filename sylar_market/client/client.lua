@@ -307,8 +307,12 @@ local function OpenMarket(marketId)
             minPointWithdraw = (Config.Points and Config.Points.minWithdraw) or 500,
         },
         pointsConfig = Config.Points,
+        isDev = isDev,
     })
-    
+
+    -- Dev statüsünü her açılışta tazele (geç gelirse UI güncellenir)
+    TriggerServerEvent('market:requestDevStatus')
+
     SetNuiFocus(true, true)
     Notify(Config.Locale['market_open'], 'success')
 end
