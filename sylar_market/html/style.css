@@ -42,6 +42,21 @@
 }
 
 /* ============================================
+   PERFORMANCE OVERRIDES (FiveM CEF)
+   Reduce expensive infinite animations to keep UI responsive.
+   ============================================ */
+.market-container.holo-frame { animation: none !important; }
+.market-container.holo-frame::before { animation-duration: 12s !important; opacity: 0.55 !important; filter: none !important; }
+.category-sidebar.holo-frame-sidebar::before { animation-duration: 14s !important; opacity: 0.5 !important; }
+.category-btn.active { animation: none !important; }
+.market-header::before,
+.market-header::after { animation-duration: 6s !important; }
+.market-location::before { animation: none !important; }
+.sidebar-dot { animation: none !important; opacity: 0.6 !important; }
+.product-card { animation: none !important; }
+.tech-grid-bg-sidebar { animation: none !important; }
+
+/* ============================================
    BASE STYLES
    ============================================ */
 * {
@@ -78,22 +93,16 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(12, 16, 24, 0.85);
-}
-
-.tech-grid-bg {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-image: 
-    linear-gradient(rgba(51, 230, 217, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(51, 230, 217, 0.03) 1px, transparent 1px);
-  background-size: 30px 30px;
-  animation: gridMove 20s linear infinite;
+  background: transparent;
   pointer-events: none;
 }
+
+#market-app > * {
+  pointer-events: auto;
+}
+
+/* Global tech-grid background removed for transparency outside market */
+.tech-grid-bg { display: none !important; }
 
 @keyframes gridMove {
   0% { background-position: 0 0; }
@@ -106,8 +115,9 @@ html, body {
 .market-container {
   position: relative;
   width: 100%;
-  max-width: 1400px;
-  height: 85vh;
+  max-width: 1280px;
+  height: 73vh;
+  max-height: 73vh;
   overflow: hidden;
   border-radius: var(--radius-lg);
 }
@@ -158,29 +168,13 @@ html, body {
   100% { background-position: 400% 50%; }
 }
 
-/* Holographic shimmer overlay inside the frame */
+/* Holographic shimmer overlay — disabled for performance */
 .market-container.holo-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    45deg,
-    transparent 0%,
-    hsla(175, 80%, 50%, 0.08) 25%,
-    transparent 50%,
-    hsla(280, 60%, 55%, 0.08) 75%,
-    transparent 100%
-  );
-  background-size: 200% 200%;
-  animation: holoShift 8s ease-in-out infinite;
-  pointer-events: none;
-  border-radius: var(--radius-lg);
-  z-index: 0;
+  display: none !important;
 }
 
 @keyframes holoShift {
   0%, 100% { background-position: 0% 0%; }
-  50%      { background-position: 100% 100%; }
 }
 
 @keyframes pulseGlow {
@@ -538,6 +532,10 @@ html, body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse at top left, hsla(175, 80%, 50%, 0.06), transparent 55%),
+    radial-gradient(ellipse at bottom right, hsla(280, 60%, 55%, 0.06), transparent 55%),
+    var(--bg-primary);
 }
 
 /* Category Sidebar - Holographic Frame (matches React design) */
@@ -774,9 +772,14 @@ html, body {
 
 /* Products Area */
 .products-area {
+  position: relative;
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  background-image:
+    linear-gradient(hsla(175, 80%, 50%, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(175, 80%, 50%, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 
 .products-grid {
