@@ -1219,11 +1219,21 @@
 
         // Check if not in FiveM and no market data
         if (!window.GetParentResourceName) {
+            // Generate demo sales data for chart preview
+            const demoSales = createEmptySalesData();
+            const demoItemIds = ['burger', 'pizza', 'cola', 'water', 'medkit', 'bandage', 'energy'];
+            demoSales.forEach(day => {
+                demoItemIds.forEach(id => {
+                    day.items[id] = Math.floor(Math.random() * 35) + 5;
+                });
+            });
+
             // Auto-open in demo mode after 1 second
             setTimeout(() => {
                 openMarket({
                     config: demoConfig,
-                    balance: demoBalance
+                    balance: demoBalance,
+                    salesData: demoSales
                 });
             }, 500);
         }
