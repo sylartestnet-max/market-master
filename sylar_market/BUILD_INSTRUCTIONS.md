@@ -10,7 +10,7 @@ Ana proje dizininde terminal açın ve:
 npm run build
 ```
 
-Bu komut UI build dosyalarını **direkt** `fivem-market/html/assets/ui/` içine yazacak.
+Bu komut UI build dosyalarını **direkt** `sylar_market/html/assets/ui/` içine yazacak.
 
 ## Adım 2: Kopyalama Yok (Otomatik)
 
@@ -19,7 +19,7 @@ Artık `dist/` oluşmasını beklemeyin; ayrıca `cp -r dist/* ...` yapmanıza g
 Build sonrası şu dosyaların geldiğini kontrol edin:
 
 ```
-fivem-market/html/assets/ui/
+sylar_market/html/assets/ui/
 ├── index.js
 ├── index.css
 └── chunk-*.js (varsa)
@@ -27,7 +27,7 @@ fivem-market/html/assets/ui/
 
 ## Adım 3: index.html
 
-`fivem-market/html/index.html` zaten aşağıdaki dosyaları yükleyecek şekilde ayarlı:
+`sylar_market/html/index.html` zaten aşağıdaki dosyaları yükleyecek şekilde ayarlı:
 
 - `./assets/ui/index.css`
 - `./assets/ui/index.js`
@@ -114,7 +114,7 @@ html/
 ## Test Etme
 
 1. Resource'u FiveM server'a kopyalayın
-2. `ensure fivem-market` ile başlatın
+2. `ensure sylar_market` ile başlatın
 3. Oyunda bir markete gidin
 4. NPC'ye target yapın veya E tuşuna basın
 

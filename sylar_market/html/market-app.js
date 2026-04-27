@@ -139,7 +139,7 @@
     }
 
     function getResourceName() {
-        return window.GetParentResourceName ? window.GetParentResourceName() : 'fivem-market';
+        return window.GetParentResourceName ? window.GetParentResourceName() : 'sylar_market';
     }
 
     function fetchNUI(eventName, data = {}) {
