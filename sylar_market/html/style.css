@@ -78,22 +78,16 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(12, 16, 24, 0.85);
-}
-
-.tech-grid-bg {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-image: 
-    linear-gradient(rgba(51, 230, 217, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(51, 230, 217, 0.03) 1px, transparent 1px);
-  background-size: 30px 30px;
-  animation: gridMove 20s linear infinite;
+  background: transparent;
   pointer-events: none;
 }
+
+#market-app > * {
+  pointer-events: auto;
+}
+
+/* Global tech-grid background removed for transparency outside market */
+.tech-grid-bg { display: none !important; }
 
 @keyframes gridMove {
   0% { background-position: 0 0; }
