@@ -37,8 +37,6 @@
         marketName: $('#market-name'),
         marketOwner: $('#market-owner'),
         currentMarketName: $('#current-market-name'),
-        marketDropdown: $('#market-dropdown'),
-        selectorBtn: $('#market-selector-btn'),
         balanceCash: $('#balance-cash'),
         balanceBank: $('#balance-bank'),
         balancePoints: $('#balance-points'),
@@ -575,31 +573,9 @@
     }
 
     function renderMarketSelector() {
-        elements.currentMarketName.textContent = state.config ? state.config.name.split(' - ')[0] : 'Market';
-        
-        if (state.availableMarkets.length > 0) {
-            elements.marketDropdown.innerHTML = state.availableMarkets.map(market => `
-                <button class="${market.id === state.config?.id ? 'active' : ''}" data-market-id="${market.id}">
-                    ${market.name}
-                </button>
-            `).join('');
-            elements.marketDropdown.querySelectorAll('[data-market-id]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const selected = state.availableMarkets.find(market => market.id === btn.dataset.marketId);
-                    if (!selected || selected.id === state.config.id) {
-                        elements.marketDropdown.classList.add('hidden');
-                        return;
-                    }
-
-                    openMarket({
-                        config: selected,
-                        balance: state.balance,
-                        availableMarkets: state.availableMarkets,
-                        salesData: state.salesData
-                    });
-                    elements.marketDropdown.classList.add('hidden');
-                });
-            });
+        // Sadece bulunduğu marketin adını gösterir (NPC bazlı, seçim yok)
+        if (state.config) {
+            elements.currentMarketName.textContent = state.config.name;
         }
     }
 
@@ -999,15 +975,7 @@
         });
         elements.withdrawBtn.addEventListener('click', handleWithdraw);
 
-        // Market selector
-        elements.selectorBtn.addEventListener('click', () => {
-            elements.marketDropdown.classList.toggle('hidden');
-        });
-        document.addEventListener('click', (e) => {
-            if (!elements.selectorBtn.contains(e.target)) {
-                elements.marketDropdown.classList.add('hidden');
-            }
-        });
+        // (Market selector kaldırıldı - NPC bazlı tek market gösterimi)
 
         // ESC key
         document.addEventListener('keydown', (e) => {
