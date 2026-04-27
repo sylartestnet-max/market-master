@@ -7,6 +7,20 @@ local ESX = nil
 local isUIOpen = false
 local currentMarket = nil
 local lastEventTime = 0
+local isDev = false
+
+-- Server'dan dev statüsünü al
+RegisterNetEvent('market:devStatus', function(value)
+    isDev = value and true or false
+    if isUIOpen then
+        SendNUIMessage({ action = 'updateDevStatus', isDev = isDev })
+    end
+end)
+
+CreateThread(function()
+    Wait(2000)
+    TriggerServerEvent('market:requestDevStatus')
+end)
 
 -- ═══════════════════════════════════════════════════════════════════
 -- FRAMEWORK INITIALIZATION
@@ -293,8 +307,12 @@ local function OpenMarket(marketId)
             minPointWithdraw = (Config.Points and Config.Points.minWithdraw) or 500,
         },
         pointsConfig = Config.Points,
+        isDev = isDev,
     })
-    
+
+    -- Dev statüsünü her açılışta tazele (geç gelirse UI güncellenir)
+    TriggerServerEvent('market:requestDevStatus')
+
     SetNuiFocus(true, true)
     Notify(Config.Locale['market_open'], 'success')
 end

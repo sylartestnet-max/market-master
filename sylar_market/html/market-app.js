@@ -23,7 +23,8 @@
         marketOwner: null,
         availableMarkets: [],
         salesData: [],
-        selectedSalesItemId: null
+        selectedSalesItemId: null,
+        isDev: false
     };
 
     // ============================================
@@ -350,10 +351,20 @@
     }
 
     function updateTransferButtonState() {
+        if (!elements.transferBtn) return;
+        // DEV-only: yalnızca dev yetkisi olan oyuncu görür
+        if (!state.isDev) {
+            elements.transferBtn.classList.add('hidden');
+            elements.transferBtn.style.display = 'none';
+            return;
+        }
+        elements.transferBtn.classList.remove('hidden');
+        elements.transferBtn.style.display = '';
+
         const canTransfer = !!(state.config && state.config.ownable);
         elements.transferBtn.classList.toggle('disabled', !canTransfer);
         elements.transferBtn.disabled = !canTransfer;
-        elements.transferBtn.title = canTransfer ? 'Market Devri' : 'Bu market devredilemez';
+        elements.transferBtn.title = canTransfer ? 'Market Devri (DEV)' : 'Bu market devredilemez';
     }
 
     function openSalesPanel() {
@@ -890,6 +901,9 @@
         if (!state.salesData.length) {
             state.salesData = createEmptySalesData();
         }
+        if (typeof data.isDev === 'boolean') {
+            state.isDev = data.isDev;
+        }
         state.cart = [];
         state.paymentMethod = 'cash';
         state.searchQuery = '';
@@ -1079,7 +1093,8 @@
                         config: data.config,
                         balance: data.balance,
                         availableMarkets: data.availableMarkets,
-                        salesData: data.salesData
+                        salesData: data.salesData,
+                        isDev: data.isDev
                     });
                 } else if (data.data) {
                     const d = data.data;
@@ -1093,9 +1108,14 @@
                             items: d.items || [],
                             categories: d.categories || []
                         },
-                        balance: d.balance || { cash: 0, bank: 0, points: 0, minPointWithdraw: 500 }
+                        balance: d.balance || { cash: 0, bank: 0, points: 0, minPointWithdraw: 500 },
+                        isDev: d.isDev
                     });
                 }
+                break;
+            case 'updateDevStatus':
+                state.isDev = !!data.isDev;
+                updateTransferButtonState();
                 break;
             case 'closeMarket':
                 closeMarket();

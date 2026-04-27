@@ -31,6 +31,42 @@ local function GetPlayer(source)
     return nil
 end
 
+-- DEV yetkisi kontrolü: QBCore permission veya ace izin
+local function IsPlayerDev(source)
+    if not source or source == 0 then return false end
+
+    -- Ace izinleri kontrolü
+    if Config.DevAces then
+        for _, ace in ipairs(Config.DevAces) do
+            if IsPlayerAceAllowed(source, ace) then
+                return true
+            end
+        end
+    end
+
+    -- QBCore permission kontrolü
+    if Config.Framework == 'qb' and QBCore then
+        if Config.DevPermissions then
+            for _, perm in ipairs(Config.DevPermissions) do
+                local ok, has = pcall(function()
+                    return QBCore.Functions.HasPermission(source, perm)
+                end)
+                if ok and has then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+-- Client'tan dev yetkisini sorgulamak için callback
+RegisterNetEvent('market:requestDevStatus', function()
+    local src = source
+    TriggerClientEvent('market:devStatus', src, IsPlayerDev(src))
+end)
+
 local function GetPlayerIdentifier(source)
     if Config.Framework == 'qb' then
         local Player = QBCore.Functions.GetPlayer(source)
@@ -374,19 +410,22 @@ end)
 
 RegisterNetEvent('market:transferMarket', function(data)
     local source = source
+
+    -- DEV yetkisi kontrolü (sadece dev marketi devredebilir)
+    if not IsPlayerDev(source) then
+        TriggerClientEvent('market:transferResult', source, false, 'Bu işlem için DEV yetkisi gereklidir.')
+        return
+    end
+
     local market = Config.Markets[data.marketId]
-    
+
     if not market or not market.ownable then
         TriggerClientEvent('market:transferResult', source, false, 'Bu market devredilemez.')
         return
     end
     
-    -- Check if player is current owner
-    local playerId = GetPlayerIdentifier(source)
-    if market.ownerId ~= playerId then
-        TriggerClientEvent('market:transferResult', source, false, 'Sadece mevcut sahip marketi devredebilir.')
-        return
-    end
+    -- DEV her marketi devredebilir; mevcut owner kontrolü atlanır.
+    -- (Daha önce: yalnızca mevcut sahip devredebiliyordu)
     
     -- Get new owner info
     local newOwnerSource = GetPlayerByIdentifier(data.newOwnerId)

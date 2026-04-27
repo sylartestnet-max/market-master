@@ -29,6 +29,15 @@ Config.Security = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════
+-- DEV YETKİSİ (Marketi Devret özelliğini sadece DEV görür/kullanır)
+-- ═══════════════════════════════════════════════════════════════════
+-- QBCore'da en yüksek yetki: 'god' veya 'dev' (qbcore.dev permission)
+-- Burada listelenen permission'lardan herhangi birine sahipse DEV sayılır.
+Config.DevPermissions = { 'god', 'dev', 'qbcore.dev', 'admin' }
+-- Ek olarak ace izinleri (server.cfg'de add_ace ile verilen):
+Config.DevAces = { 'qbcore.dev', 'command.dev' }
+
+-- ═══════════════════════════════════════════════════════════════════
 -- PUAN SİSTEMİ
 -- ═══════════════════════════════════════════════════════════════════
 Config.Points = {
