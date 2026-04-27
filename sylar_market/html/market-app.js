@@ -280,6 +280,73 @@
                 <strong>${(day.items[selected.item.id] || 0).toLocaleString()}</strong>
             </div>
         `).join('');
+
+        // Render bar chart (SVG)
+        renderSalesChart(selected.item.id);
+    }
+
+    function renderSalesChart(itemId) {
+        const wrap = document.getElementById('sales-chart-wrap');
+        if (!wrap) return;
+
+        const days = state.salesData.map(day => ({
+            label: day.label,
+            value: day.items[itemId] || 0
+        }));
+
+        const maxVal = Math.max(1, ...days.map(d => d.value));
+        const W = 560, H = 220;
+        const padL = 36, padR = 12, padT = 16, padB = 32;
+        const chartW = W - padL - padR;
+        const chartH = H - padT - padB;
+        const barGap = 12;
+        const barW = (chartW - barGap * (days.length - 1)) / days.length;
+
+        // Y axis ticks (4 lines)
+        const ticks = 4;
+        const tickLines = [];
+        for (let i = 0; i <= ticks; i += 1) {
+            const y = padT + (chartH * i) / ticks;
+            const val = Math.round(maxVal * (1 - i / ticks));
+            tickLines.push(`
+                <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}"
+                    stroke="hsla(175, 80%, 50%, 0.12)" stroke-width="1" stroke-dasharray="3 3"/>
+                <text x="${padL - 6}" y="${y + 4}" text-anchor="end"
+                    fill="hsla(200, 15%, 55%, 0.85)" font-size="10" font-family="Segoe UI, sans-serif">${val}</text>
+            `);
+        }
+
+        const bars = days.map((d, i) => {
+            const x = padL + i * (barW + barGap);
+            const h = (d.value / maxVal) * chartH;
+            const y = padT + chartH - h;
+            const labelY = padT + chartH + 18;
+            const valueY = y - 6;
+            return `
+                <defs>
+                    <linearGradient id="barGrad${i}" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="hsl(175, 80%, 60%)" stop-opacity="1"/>
+                        <stop offset="100%" stop-color="hsl(175, 80%, 40%)" stop-opacity="0.85"/>
+                    </linearGradient>
+                </defs>
+                <rect x="${x}" y="${y}" width="${barW}" height="${h}"
+                    rx="4" ry="4" fill="url(#barGrad${i})"
+                    style="filter: drop-shadow(0 0 6px hsla(175, 80%, 50%, 0.45));"/>
+                ${d.value > 0 ? `<text x="${x + barW / 2}" y="${valueY}" text-anchor="middle"
+                    fill="hsl(175, 80%, 70%)" font-size="11" font-weight="700"
+                    font-family="Segoe UI, sans-serif">${d.value}</text>` : ''}
+                <text x="${x + barW / 2}" y="${labelY}" text-anchor="middle"
+                    fill="hsla(200, 15%, 65%, 0.95)" font-size="11"
+                    font-family="Segoe UI, sans-serif">${d.label}</text>
+            `;
+        }).join('');
+
+        wrap.innerHTML = `
+            <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="sales-chart-svg">
+                ${tickLines.join('')}
+                ${bars}
+            </svg>
+        `;
     }
 
     function updateTransferButtonState() {
