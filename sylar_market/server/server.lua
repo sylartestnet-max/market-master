@@ -424,12 +424,8 @@ RegisterNetEvent('market:transferMarket', function(data)
         return
     end
     
-    -- Check if player is current owner
-    local playerId = GetPlayerIdentifier(source)
-    if market.ownerId ~= playerId then
-        TriggerClientEvent('market:transferResult', source, false, 'Sadece mevcut sahip marketi devredebilir.')
-        return
-    end
+    -- DEV her marketi devredebilir; mevcut owner kontrolü atlanır.
+    -- (Daha önce: yalnızca mevcut sahip devredebiliyordu)
     
     -- Get new owner info
     local newOwnerSource = GetPlayerByIdentifier(data.newOwnerId)
