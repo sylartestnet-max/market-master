@@ -2765,10 +2765,11 @@ html, body {
 /* Cart item v2 - bracket frame */
 .cart-item-v2 {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto auto 28px;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 12px;
   background: hsla(220, 30%, 12%, 0.6);
   border: 1px solid hsla(175, 80%, 50%, 0.25);
   border-radius: 8px;
@@ -2804,44 +2805,54 @@ html, body {
 }
 
 .cart-item-v2 .cart-item-image {
-  width: 38px; height: 38px;
+  width: 44px; height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 0 6px hsla(175, 80%, 50%, 0.4));
   flex-shrink: 0;
+  background: hsla(220, 30%, 8%, 0.5);
+  border: 1px solid hsla(175, 80%, 50%, 0.2);
+  border-radius: 6px;
 }
 .cart-item-v2 .cart-item-image .img-icon { width: 32px; height: 32px; object-fit: contain; }
 .cart-item-v2 .cart-item-image .emoji-icon { font-size: 26px; }
 
 .cart-item-v2 .cart-item-info {
-  flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .cart-item-v2 .cart-item-name {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.02em;
 }
 .cart-item-v2 .cart-item-price {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--neon-cyan);
   font-weight: 500;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
-/* Quantity controls v2 - editable input */
+/* Quantity controls v2 - editable input — symmetric */
 .cart-item-controls-v2 {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  padding: 3px 4px;
+  background: hsla(220, 30%, 8%, 0.6);
+  border: 1px solid hsla(175, 80%, 50%, 0.25);
+  border-radius: 6px;
 }
 .qty-btn-v2 {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2853,6 +2864,7 @@ html, body {
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 3px;
+  flex-shrink: 0;
 }
 .qty-btn-v2:hover {
   background: hsla(175, 80%, 50%, 0.18);
@@ -2860,20 +2872,21 @@ html, body {
   color: var(--neon-cyan);
 }
 .qty-input {
-  width: 36px;
+  width: 40px;
   height: 24px;
   text-align: center;
-  background: hsla(220, 25%, 12%, 0.8);
-  border: 1px solid hsla(175, 80%, 50%, 0.35);
-  color: var(--text-primary);
+  background: hsla(220, 25%, 12%, 0.85);
+  border: 1px solid hsla(175, 80%, 50%, 0.3);
+  color: var(--neon-cyan);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   border-radius: 3px;
   outline: none;
   -moz-appearance: textfield;
   appearance: textfield;
   font-family: inherit;
   padding: 0;
+  flex-shrink: 0;
 }
 .qty-input::-webkit-outer-spin-button,
 .qty-input::-webkit-inner-spin-button {
@@ -2885,18 +2898,19 @@ html, body {
   box-shadow: 0 0 8px hsla(175, 80%, 50%, 0.4);
 }
 
-/* Subtotal pill (cyan filled) */
+/* Subtotal pill (cyan filled) — fixed width, right-aligned, symmetric */
 .cart-item-subtotal {
-  min-width: 56px;
-  padding: 5px 10px;
+  min-width: 72px;
+  padding: 6px 12px;
   background: hsla(175, 80%, 50%, 0.15);
   border: 1px solid hsla(175, 80%, 50%, 0.45);
   color: var(--neon-cyan);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   text-align: center;
-  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   text-shadow: 0 0 6px hsla(175, 80%, 50%, 0.5);
+  white-space: nowrap;
 }
 
 .cart-item-trash {
