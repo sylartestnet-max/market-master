@@ -2022,6 +2022,37 @@ html, body {
   color: var(--text-secondary);
 }
 
+.sales-summary-sub {
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.sales-chart-wrap {
+  margin-bottom: 16px;
+  padding: 14px 12px 8px;
+  background:
+    linear-gradient(180deg, hsla(175, 80%, 50%, 0.04) 0%, transparent 60%),
+    var(--bg-tertiary);
+  border: 1px solid hsla(175, 80%, 50%, 0.18);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 24px hsla(175, 80%, 50%, 0.05);
+}
+
+.sales-chart-svg {
+  width: 100%;
+  height: 220px;
+  display: block;
+}
+
+.sales-chart-svg rect {
+  transition: filter 0.2s ease;
+}
+
+.sales-chart-svg rect:hover {
+  filter: drop-shadow(0 0 12px hsla(175, 80%, 50%, 0.85)) brightness(1.15) !important;
+}
+
 .sales-days-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
