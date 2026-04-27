@@ -153,29 +153,13 @@ html, body {
   100% { background-position: 400% 50%; }
 }
 
-/* Holographic shimmer overlay inside the frame */
+/* Holographic shimmer overlay — disabled for performance */
 .market-container.holo-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    45deg,
-    transparent 0%,
-    hsla(175, 80%, 50%, 0.08) 25%,
-    transparent 50%,
-    hsla(280, 60%, 55%, 0.08) 75%,
-    transparent 100%
-  );
-  background-size: 200% 200%;
-  animation: holoShift 8s ease-in-out infinite;
-  pointer-events: none;
-  border-radius: var(--radius-lg);
-  z-index: 0;
+  display: none !important;
 }
 
 @keyframes holoShift {
   0%, 100% { background-position: 0% 0%; }
-  50%      { background-position: 100% 100%; }
 }
 
 @keyframes pulseGlow {
