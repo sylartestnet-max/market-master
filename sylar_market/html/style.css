@@ -772,9 +772,14 @@ html, body {
 
 /* Products Area */
 .products-area {
+  position: relative;
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  background-image:
+    linear-gradient(hsla(175, 80%, 50%, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(175, 80%, 50%, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 
 .products-grid {
