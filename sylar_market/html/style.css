@@ -532,6 +532,10 @@ html, body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse at top left, hsla(175, 80%, 50%, 0.06), transparent 55%),
+    radial-gradient(ellipse at bottom right, hsla(280, 60%, 55%, 0.06), transparent 55%),
+    var(--bg-primary);
 }
 
 /* Category Sidebar - Holographic Frame (matches React design) */
