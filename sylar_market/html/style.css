@@ -42,6 +42,21 @@
 }
 
 /* ============================================
+   PERFORMANCE OVERRIDES (FiveM CEF)
+   Reduce expensive infinite animations to keep UI responsive.
+   ============================================ */
+.market-container.holo-frame { animation: none !important; }
+.market-container.holo-frame::before { animation-duration: 12s !important; opacity: 0.55 !important; filter: none !important; }
+.category-sidebar.holo-frame-sidebar::before { animation-duration: 14s !important; opacity: 0.5 !important; }
+.category-btn.active { animation: none !important; }
+.market-header::before,
+.market-header::after { animation-duration: 6s !important; }
+.market-location::before { animation: none !important; }
+.sidebar-dot { animation: none !important; opacity: 0.6 !important; }
+.product-card { animation: none !important; }
+.tech-grid-bg-sidebar { animation: none !important; }
+
+/* ============================================
    BASE STYLES
    ============================================ */
 * {
