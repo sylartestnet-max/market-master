@@ -493,5 +493,20 @@ RegisterNetEvent('market:transferResult', function(success, message)
     })
 end)
 
+-- Haftalık satış istatistikleri (MySQL'den)
+RegisterNetEvent('market:salesData', function(salesData, itemNames)
+    SendNUIMessage({
+        action = 'updateSalesData',
+        salesData = salesData or {},
+        itemNames = itemNames or {},
+    })
+end)
+
+-- NUI istatistik isteği
+RegisterNUICallback('requestSalesData', function(_, cb)
+    TriggerServerEvent('market:requestSalesData')
+    cb('ok')
+end)
+
 -- Export for other resources
 exports('OpenMarket', OpenMarket)
