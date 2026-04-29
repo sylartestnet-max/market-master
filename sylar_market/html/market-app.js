@@ -370,6 +370,12 @@
     function openSalesPanel() {
         renderSalesPanel();
         elements.salesPanel.classList.remove('hidden');
+        // MySQL'den güncel haftalık satış verisini çek
+        fetch(`https://${GetParentResourceName()}/requestSalesData`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}'
+        }).catch(() => {});
     }
 
     function closeSalesPanel() {
