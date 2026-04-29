@@ -310,8 +310,9 @@ local function OpenMarket(marketId)
         isDev = isDev,
     })
 
-    -- Dev statüsünü her açılışta tazele (geç gelirse UI güncellenir)
+    -- Dev statüsünü ve satış verilerini her açılışta tazele
     TriggerServerEvent('market:requestDevStatus')
+    TriggerServerEvent('market:requestSalesData')
 
     SetNuiFocus(true, true)
     Notify(Config.Locale['market_open'], 'success')
