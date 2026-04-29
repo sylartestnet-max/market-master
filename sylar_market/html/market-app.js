@@ -1117,6 +1117,17 @@
                 state.isDev = !!data.isDev;
                 updateTransferButtonState();
                 break;
+            case 'updateSalesData':
+                if (Array.isArray(data.salesData) && data.salesData.length) {
+                    state.salesData = data.salesData;
+                }
+                if (data.itemNames && typeof data.itemNames === 'object') {
+                    state.itemNames = { ...(state.itemNames || {}), ...data.itemNames };
+                }
+                if (elements.salesPanel && !elements.salesPanel.classList.contains('hidden')) {
+                    renderSalesPanel();
+                }
+                break;
             case 'closeMarket':
                 closeMarket();
                 break;
