@@ -43,10 +43,22 @@ Config.DevAces = { 'qbcore.dev', 'command.dev' }
 Config.Points = {
     Enabled = true,
     PointsPerDollar = 1,
-    OwnerBonusPercent = 5,
+    OwnerBonusPercent = 5,        -- Online sahip puan bonusu (kişisel)
     Multiplier = 1.0,
     minWithdraw = 500,
 }
+
+-- ═══════════════════════════════════════════════════════════════════
+-- MARKET SAHİBİ KASA BONUSU (Boss Menü Entegrasyonu)
+-- ═══════════════════════════════════════════════════════════════════
+-- Tüm marketlerden alışveriş yapan oyuncuların kazandığı puanların
+-- bu yüzdesi market mesleğinin (sylar_bossmenu) şirket kasasına yatar.
+Config.OwnerCutPercent = 50
+
+-- Devredilen kişinin atanacağı QBCore mesleği ve boss rütbesi.
+-- (qb-core/shared/jobs.lua içinde 'market' jobu tanımlı olmalı)
+Config.MarketJob = 'market'
+Config.MarketJobBossGrade = 4
 
 -- ═══════════════════════════════════════════════════════════════════
 -- MARKET NOKTALARI

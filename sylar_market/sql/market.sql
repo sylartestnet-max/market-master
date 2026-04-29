@@ -28,6 +28,17 @@ CREATE TABLE IF NOT EXISTS `market_logs` (
     INDEX `idx_timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Weekly Sales Statistics (KALICI - resetlenmez)
+CREATE TABLE IF NOT EXISTS `market_weekly_sales` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `sale_date` DATE NOT NULL,
+    `item_id` VARCHAR(64) NOT NULL,
+    `item_name` VARCHAR(120) NOT NULL,
+    `quantity` INT NOT NULL DEFAULT 0,
+    UNIQUE KEY `uniq_date_item` (`sale_date`, `item_id`),
+    INDEX `idx_sale_date` (`sale_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Market Points for ESX (QB uses metadata)
 -- Add this column to your users table if using ESX:
 -- ALTER TABLE `users` ADD COLUMN `marketpoints` INT DEFAULT 0;

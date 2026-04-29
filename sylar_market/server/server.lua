@@ -375,11 +375,12 @@ RegisterNetEvent('market:purchase', function(data)
     end
     
     -- Calculate and add points
+    local points = 0
     if Config.Points.Enabled then
-        local points = math.floor(totalPrice * Config.Points.PointsPerDollar * Config.Points.Multiplier)
+        points = math.floor(totalPrice * Config.Points.PointsPerDollar * Config.Points.Multiplier)
         AddPoints(source, points)
-        
-        -- Owner bonus points
+
+        -- Owner bonus points (online ise)
         if market.ownerId then
             local ownerSource = GetPlayerByIdentifier(market.ownerId)
             if ownerSource then
@@ -388,20 +389,95 @@ RegisterNetEvent('market:purchase', function(data)
             end
         end
     end
-    
+
+    -- ═══════════ MARKET SAHİBİ KASA BONUSU ═══════════
+    -- TÜM marketlerden kazanılan puanların %50'si market mesleğindeki kişinin (boss menü) kasasına yatar.
+    -- Sahip = market_ownership tablosundaki herhangi bir aktif sahip; biz "market" job kasasına ekliyoruz.
+    if Config.OwnerCutPercent and Config.OwnerCutPercent > 0 and points > 0 then
+        local cut = math.floor(points * (Config.OwnerCutPercent / 100))
+        if cut > 0 then
+            pcall(function()
+                if MySQL and MySQL.update then
+                    -- management_funds tablosu (sylar_bossmenu) ile entegre
+                    MySQL.update.await([[
+                        INSERT INTO management_funds (job_name, amount, type)
+                        VALUES (?, ?, 'boss')
+                        ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)
+                    ]], { Config.MarketJob or 'market', cut })
+                end
+            end)
+        end
+    end
+
     -- Log purchase
     LogPurchase(source, data.marketId, validatedItems, totalPrice, data.paymentMethod)
-    
+
+    -- Haftalık satış istatistiklerini MySQL'e kaydet (kalıcı)
+    pcall(function()
+        if MySQL and MySQL.insert then
+            for _, vi in ipairs(validatedItems) do
+                local itemConf = Config.Items[vi.itemId]
+                local itemName = itemConf and itemConf.name or vi.itemId
+                MySQL.insert.await([[
+                    INSERT INTO market_weekly_sales (sale_date, item_id, item_name, quantity)
+                    VALUES (CURDATE(), ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity), item_name = VALUES(item_name)
+                ]], { vi.itemId, itemName, vi.quantity })
+            end
+        end
+    end)
+
     -- Get new balance
     local newBalance = {
         cash = GetPlayerMoney(source, 'cash'),
         bank = GetPlayerMoney(source, 'bank'),
         points = GetPlayerPoints(source),
     }
-    
+
     -- Success response
     local message = string.format('%s ($%s)', Config.Locale['purchase_success'], totalPrice)
     TriggerClientEvent('market:purchaseResult', source, true, message, newBalance)
+end)
+
+-- ═══════════════════════════════════════════════════════════════════
+-- HAFTALIK SATIŞ İSTATİSTİKLERİ (kalıcı, MySQL)
+-- ═══════════════════════════════════════════════════════════════════
+
+local function GetWeeklySales()
+    local out = {}
+    local rows = {}
+    pcall(function()
+        rows = MySQL.query.await([[
+            SELECT DATE_FORMAT(sale_date, '%Y-%m-%d') AS date, item_id, item_name, quantity
+            FROM market_weekly_sales
+            WHERE sale_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            ORDER BY sale_date ASC
+        ]]) or {}
+    end)
+
+    -- 7 günlük şablon
+    local dayMap = {}
+    for i = 6, 0, -1 do
+        local key = os.date('%Y-%m-%d', os.time() - i * 86400)
+        dayMap[key] = { date = key, items = {} }
+        table.insert(out, dayMap[key])
+    end
+
+    local itemNames = {}
+    for _, r in ipairs(rows) do
+        if dayMap[r.date] then
+            dayMap[r.date].items[r.item_id] = (dayMap[r.date].items[r.item_id] or 0) + (r.quantity or 0)
+        end
+        itemNames[r.item_id] = r.item_name
+    end
+
+    return out, itemNames
+end
+
+RegisterNetEvent('market:requestSalesData', function()
+    local src = source
+    local sales, names = GetWeeklySales()
+    TriggerClientEvent('market:salesData', src, sales, names)
 end)
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -419,31 +495,46 @@ RegisterNetEvent('market:transferMarket', function(data)
 
     local market = Config.Markets[data.marketId]
 
-    if not market or not market.ownable then
-        TriggerClientEvent('market:transferResult', source, false, 'Bu market devredilemez.')
+    if not market then
+        TriggerClientEvent('market:transferResult', source, false, 'Market bulunamadı.')
         return
     end
-    
-    -- DEV her marketi devredebilir; mevcut owner kontrolü atlanır.
-    -- (Daha önce: yalnızca mevcut sahip devredebiliyordu)
-    
+
+    -- DEV her marketi devredebilir (ownable kontrolü atlanır)
+
     -- Get new owner info
     local newOwnerSource = GetPlayerByIdentifier(data.newOwnerId)
     if not newOwnerSource then
         TriggerClientEvent('market:transferResult', source, false, 'Yeni sahip oyunda bulunamadı.')
         return
     end
-    
+
     local newOwnerName = data.newOwnerName and data.newOwnerName ~= '' and data.newOwnerName or GetPlayerName(newOwnerSource)
-    
+
     -- Update config
     Config.Markets[data.marketId].ownerId = data.newOwnerId
     Config.Markets[data.marketId].ownerName = newOwnerName
-    
+
     -- Update database
     MySQL.update('UPDATE market_ownership SET owner_id = ?, owner_name = ? WHERE market_id = ?',
         {data.newOwnerId, newOwnerName, data.marketId})
-    
+
+    -- ═══════════ MARKET MESLEĞİNE BOSS OLARAK ATA ═══════════
+    if Config.Framework == 'qb' and QBCore then
+        local NewOwnerPlayer = QBCore.Functions.GetPlayer(newOwnerSource)
+        if NewOwnerPlayer then
+            local jobName = Config.MarketJob or 'market'
+            local jobGrade = Config.MarketJobBossGrade or 4
+            local ok = pcall(function()
+                NewOwnerPlayer.Functions.SetJob(jobName, jobGrade)
+            end)
+            if ok then
+                TriggerClientEvent('QBCore:Notify', newOwnerSource,
+                    ('Artık %s mesleğinin patronusunuz.'):format(jobName), 'success')
+            end
+        end
+    end
+
     -- Notify all clients
     TriggerClientEvent('market:updateOwner', -1, data.marketId, data.newOwnerId, newOwnerName)
     TriggerClientEvent('market:transferResult', source, true, 'Market başarıyla devredildi.')
