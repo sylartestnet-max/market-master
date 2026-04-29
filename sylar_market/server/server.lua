@@ -495,31 +495,46 @@ RegisterNetEvent('market:transferMarket', function(data)
 
     local market = Config.Markets[data.marketId]
 
-    if not market or not market.ownable then
-        TriggerClientEvent('market:transferResult', source, false, 'Bu market devredilemez.')
+    if not market then
+        TriggerClientEvent('market:transferResult', source, false, 'Market bulunamadı.')
         return
     end
-    
-    -- DEV her marketi devredebilir; mevcut owner kontrolü atlanır.
-    -- (Daha önce: yalnızca mevcut sahip devredebiliyordu)
-    
+
+    -- DEV her marketi devredebilir (ownable kontrolü atlanır)
+
     -- Get new owner info
     local newOwnerSource = GetPlayerByIdentifier(data.newOwnerId)
     if not newOwnerSource then
         TriggerClientEvent('market:transferResult', source, false, 'Yeni sahip oyunda bulunamadı.')
         return
     end
-    
+
     local newOwnerName = data.newOwnerName and data.newOwnerName ~= '' and data.newOwnerName or GetPlayerName(newOwnerSource)
-    
+
     -- Update config
     Config.Markets[data.marketId].ownerId = data.newOwnerId
     Config.Markets[data.marketId].ownerName = newOwnerName
-    
+
     -- Update database
     MySQL.update('UPDATE market_ownership SET owner_id = ?, owner_name = ? WHERE market_id = ?',
         {data.newOwnerId, newOwnerName, data.marketId})
-    
+
+    -- ═══════════ MARKET MESLEĞİNE BOSS OLARAK ATA ═══════════
+    if Config.Framework == 'qb' and QBCore then
+        local NewOwnerPlayer = QBCore.Functions.GetPlayer(newOwnerSource)
+        if NewOwnerPlayer then
+            local jobName = Config.MarketJob or 'market'
+            local jobGrade = Config.MarketJobBossGrade or 4
+            local ok = pcall(function()
+                NewOwnerPlayer.Functions.SetJob(jobName, jobGrade)
+            end)
+            if ok then
+                TriggerClientEvent('QBCore:Notify', newOwnerSource,
+                    ('Artık %s mesleğinin patronusunuz.'):format(jobName), 'success')
+            end
+        end
+    end
+
     -- Notify all clients
     TriggerClientEvent('market:updateOwner', -1, data.marketId, data.newOwnerId, newOwnerName)
     TriggerClientEvent('market:transferResult', source, true, 'Market başarıyla devredildi.')
